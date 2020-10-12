@@ -6,15 +6,10 @@ from ctg_lib import write_log
 from set_env_dirs import in_triton
 from ctg_lib import import_data
 from ctg_classifiers.random_train_test_indices import train_test_split
+from ctg_classifiers.make_feature import make_feats
 from ctg_lib.ctg_time import now_time_string
 
-from pathlib import Path
-import pandas as pd
-import numpy as np
-import scipy as sci
-import matplotlib.pyplot as plt
 
-from sklearn import preprocessing
 
 
 def main(pdg, classifier):
@@ -37,6 +32,7 @@ def main(pdg, classifier):
     X_train, X_test, y_train, y_test = train_test_split(pdg, my_env, logger, classifier, start_time,
                                                         normal_df.shape[1], salt_df.shape[1], split=0.2)
 
+    make_feats(pdg, start_time, my_env, normal_df, salt_df, X_train, X_test, y_train, y_test)
 
     print("All done here, with {}".format(out_dir))
     logger.info("Finalized script classifying {}".format(out_dir))
