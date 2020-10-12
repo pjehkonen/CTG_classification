@@ -12,9 +12,8 @@ import matplotlib.pyplot as plt
 
 from sklearn import preprocessing
 
-if __name__ == '__main__':
+def main():
 
-    # Making sure
     if in_triton.in_triton():
         sys.path.append('/scratch/cs/salka/PJ_SALKA/CTG_classification/ctg_lib')
         print("lib appended to Triton path")
@@ -26,3 +25,8 @@ if __name__ == '__main__':
 
     print("All done here, with {}".format(out_dir))
     logger.info("Finalized script classifying {}".format(out_dir))
+
+
+if __name__ == '__main__':
+
+    main()
