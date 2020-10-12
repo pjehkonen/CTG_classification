@@ -7,6 +7,7 @@ import logging
 from ctg_path_env import CTGPaths
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
+from set_env_dirs import in_triton
 
 import pandas as pd
 import numpy as np
@@ -17,6 +18,10 @@ import matplotlib.pyplot as plt
 from sklearn import preprocessing
 
 if __name__ == '__main__':
+
+    if in_triton.intriton():
+        sys.path.append('/scratch/cs/salka/PJ_SALKA/ctg_saltatory_code/lib')
+        print("lib appended to Triton path")
 
     out_dir = "LogisticRegression"
     inTriton, myEnv = setup_env.setup_env(True, output_dir=out_dir)
