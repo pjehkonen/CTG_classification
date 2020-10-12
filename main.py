@@ -6,6 +6,7 @@ import logging
 
 from ctg_path_env import CTGPaths
 from set_env_dirs import setup_env
+from set_env_dirs import setup_log
 
 import pandas as pd
 import numpy as np
@@ -19,5 +20,6 @@ if __name__ == '__main__':
 
     out_dir = "LogisticRegression"
     inTriton, myEnv = setup_env.setup_env(True, output_dir=out_dir)
+    logger = setup_log.setup_log(True, myEnv)
 
     print("Hiphei")

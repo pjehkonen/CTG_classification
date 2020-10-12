@@ -1,5 +1,6 @@
 from ctg_path_env import CTGPaths
 from ctg_time import now_time_string
+from set_env_dirs import in_triton
 
 import os
 import sys
@@ -7,7 +8,7 @@ from pathlib import Path
 
 def setup_env(pdg, input_dir=None, output_dir=None):
 
-    if os.path.exists('/scratch'):
+    if in_triton.in_triton():
         print("Assuming working in Triton")
         inTriton = True
     else:
@@ -33,8 +34,7 @@ def setup_env(pdg, input_dir=None, output_dir=None):
 
     myEnv.log_dir = Path(myEnv.output_dir, 'log')
 
-
-    # Creating output file
+    # Creating output directory
     try:
         myEnv.output_dir.mkdir(parents=True, exist_ok=True)
     except OSError:
@@ -50,7 +50,7 @@ def setup_env(pdg, input_dir=None, output_dir=None):
     else:
         print("Successfully created (or directory existed) the directory {}".format(str(myEnv.log_dir)))
 
-    dirs_created, missing_dirs = myEnv.all_directories_exist(False)
+    dirs_created, missing_dirs = myEnv.all_directories_exist(pdg)
 
     if dirs_created:
         print("All directories exist, we are good")
