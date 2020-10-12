@@ -6,7 +6,7 @@ import os
 import sys
 from pathlib import Path
 
-def setup_env(pdg, input_dir=None, output_dir=None):
+def setup_env(pdg, input_dir=None, output_dir=None, log_start="forgot_log_start_time"):
 
     if in_triton.in_triton():
         print("Assuming working in Triton")
@@ -33,6 +33,7 @@ def setup_env(pdg, input_dir=None, output_dir=None):
         myEnv.output_dir = Path(myEnv.results_dir, output_dir)
 
     myEnv.log_dir = Path(myEnv.output_dir, 'log')
+    myEnv.sets_dir = Path(myEnv.log_dir, log_start)
 
     # Creating output directory
     try:

@@ -5,12 +5,12 @@ import sys
 
 from ctg_lib.ctg_time import now_time_string
 
-def setup_log(pdg, myEnv):
+def setup_log(pdg, myEnv, start_time):
     os_info = os.uname()
     repo = git.Repo(search_parent_directories=True)
     sha = repo.head.object.hexsha
 
-    start_time = now_time_string()
+
     logging.basicConfig(filename='{}/log_{}.log'.format(str(myEnv.log_dir), start_time),
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         level=logging.INFO,
