@@ -17,10 +17,10 @@ def train_test_split(pdg, my_env, logger, classifier, start_time, X, y, split=0.
     y_test = y_permuted[y_train_end:]
 
 
-    logger.info("Writing X training set indices to file {}".format(classifier+'/'+start_time+'/X_train.indices'))
-    logger.info("Writing X test set indices to file {}".format(classifier+'/'+start_time+'/X_test.indices'))
-    logger.info("Writing y training set indices to file {}".format(classifier+'/'+start_time+'/y_train.indices'))
-    logger.info("Writing y test set indices to file {}".format(classifier+'/'+start_time+'/y_test.indices'))
+    logger.info("Writing X training set indices to file {}".format(classifier+'/log/'+start_time+'/X_train.indices'))
+    logger.info("Writing X test set indices to file {}".format(classifier+'/log/'+start_time+'/X_test.indices'))
+    logger.info("Writing y training set indices to file {}".format(classifier+'/log/'+start_time+'/y_train.indices'))
+    logger.info("Writing y test set indices to file {}".format(classifier+'/log/'+start_time+'/y_test.indices'))
 
 
     np.savetxt(Path(my_env.sets_dir,'X_train.indices'), X_train, delimiter=',', fmt='%d')

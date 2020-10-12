@@ -26,7 +26,7 @@ def main(pdg, classifier):
     start_time = now_time_string()
 
     operating_in_triton, my_env = setup_env.setup_env(pdg, output_dir=out_dir, log_start=start_time)
-    logger = setup_log.setup_log(pdg, my_env)
+    logger = setup_log.setup_log(pdg, my_env, start_time)
 
     logger.info("This is log file for classification algorithm of {}".format(out_dir))
 

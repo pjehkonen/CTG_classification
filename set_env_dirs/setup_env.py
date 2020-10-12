@@ -51,6 +51,14 @@ def setup_env(pdg, input_dir=None, output_dir=None, log_start="forgot_log_start_
     else:
         print("Successfully created (or directory existed) the directory {}".format(str(myEnv.log_dir)))
 
+    # Creating sets dir under log
+    try:
+        myEnv.sets_dir.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        print("ERROR::Creation of the directory {} failed".format(str(myEnv.sets_dir)))
+    else:
+        print("Successfully created (or directory existed) the directory {}".format(str(myEnv.sets_dir)))
+
     dirs_created, missing_dirs = myEnv.all_directories_exist(pdg)
 
     if dirs_created:
