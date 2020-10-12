@@ -25,7 +25,7 @@ def main(pdg):
     logger = setup_log.setup_log(pdg, myEnv)
     logger.info("This is log file for classification algorithm of {}".format(out_dir))
 
-    normal_df, salt_df = import_data(pdg, myEnv)
+    normal_df, salt_df = import_data.import_data(pdg, myEnv)
 
 
     print("All done here, with {}".format(out_dir))
