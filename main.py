@@ -1,10 +1,5 @@
-from pathlib import Path
-import os
 import sys
-import git
-import logging
 
-from ctg_lib.ctg_path_env import CTGPaths
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
 from set_env_dirs import in_triton
