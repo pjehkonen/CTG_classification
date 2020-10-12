@@ -4,7 +4,7 @@ import sys
 import git
 import logging
 
-from ctg_path_env import CTGPaths
+from ctg_lib.ctg_path_env import CTGPaths
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
 from set_env_dirs import in_triton
@@ -19,7 +19,7 @@ from sklearn import preprocessing
 
 if __name__ == '__main__':
 
-    if in_triton.intriton():
+    if in_triton.in_triton():
         sys.path.append('/scratch/cs/salka/PJ_SALKA/ctg_saltatory_code/lib')
         print("lib appended to Triton path")
 

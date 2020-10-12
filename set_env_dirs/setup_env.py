@@ -1,5 +1,5 @@
-from ctg_path_env import CTGPaths
-from ctg_time import now_time_string
+from ctg_lib import ctg_path_env
+from ctg_lib import ctg_time
 from set_env_dirs import in_triton
 
 import os
@@ -19,7 +19,7 @@ def setup_env(pdg, input_dir=None, output_dir=None):
         sys.path.append('/scratch/cs/salka/PJ_SALKA/ctg_saltatory_code/lib')
         print("lib appended to Triton path")
 
-    myEnv = CTGPaths()
+    myEnv = ctg_path_env.CTGPaths()
 
     if input_dir is None:
         myEnv.input_dir = Path(myEnv.base_dir, 'saltatory_and_non_saltatory_vectors')
@@ -27,7 +27,7 @@ def setup_env(pdg, input_dir=None, output_dir=None):
         myEnv.input_dir = Path(myEnv.base_dir, input_dir)
 
     if output_dir is None:
-        this_run_text = "default_output_at_"+now_time_string()
+        this_run_text = "default_output_at_"+ctg_time.now_time_string()
         myEnv.output_dir = Path(myEnv.results_dir, this_run_text)
     else:
         myEnv.output_dir = Path(myEnv.results_dir, output_dir)

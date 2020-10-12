@@ -3,7 +3,7 @@ import git
 import logging
 import sys
 
-from ctg_time import now_time_string
+from ctg_lib.ctg_time import now_time_string
 
 def setup_log(pdg, myEnv):
     os_info = os.uname()
