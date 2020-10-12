@@ -28,3 +28,4 @@ if __name__ == '__main__':
     logger = setup_log.setup_log(True, myEnv)
 
     print("Hiphei")
+    logger.info("just printed: Hiphei")
