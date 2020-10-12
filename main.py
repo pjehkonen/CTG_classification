@@ -29,5 +29,5 @@ if __name__ == '__main__':
     logger = setup_log.setup_log(True, myEnv)
     logger.info("This is log file for classification algorithm of {}".format(out_dir))
 
-    print("Hiphei")
-    logger.info("just printed: Hiphei")
+    print("All done here, with {}".format(out_dir))
+    logger.info("Finalized script classifying {}".format(out_dir))
