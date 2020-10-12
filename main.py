@@ -19,13 +19,15 @@ from sklearn import preprocessing
 
 if __name__ == '__main__':
 
+    # Making sure
     if in_triton.in_triton():
-        sys.path.append('/scratch/cs/salka/PJ_SALKA/ctg_saltatory_code/lib')
+        sys.path.append('/scratch/cs/salka/PJ_SALKA/CTG_classification/ctg_lib')
         print("lib appended to Triton path")
 
     out_dir = "LogisticRegression"
     inTriton, myEnv = setup_env.setup_env(True, output_dir=out_dir)
     logger = setup_log.setup_log(True, myEnv)
+    logger.info("This is log file for classification algorithm of {}".format(out_dir))
 
     print("Hiphei")
     logger.info("just printed: Hiphei")

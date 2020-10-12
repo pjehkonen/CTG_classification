@@ -16,7 +16,7 @@ def setup_env(pdg, input_dir=None, output_dir=None):
         inTriton = False
 
     if inTriton:
-        sys.path.append('/scratch/cs/salka/PJ_SALKA/ctg_saltatory_code/lib')
+        sys.path.append('/scratch/cs/salka/PJ_SALKA/CTG_classification/ctg_lib')
         print("lib appended to Triton path")
 
     myEnv = ctg_path_env.CTGPaths()
