@@ -38,15 +38,14 @@ def make_welch_psd(pdg, df):
 
     windows, win_names = make_windows(v_len)
 
-    print(windows)
-    print(win_names)
-    results = np.empty(df.shape[1])
+
     for column in df.columns:
-        freqs, psd = signal.welch(df[column].values, fs=fs, )
-        plt.figure(figsize=(5, 4))
-        plt.semilogx(freqs, psd)
-        plt.title('PSD: power spectral density of column {}'.format(column))
-        plt.xlabel('Frequency')
-        plt.ylabel('Power')
-        plt.tight_layout()
-        plt.show(block=False)
+        for i, window in enumerate(windows):
+            freqs, psd = signal.welch(df[column].values, fs=fs, window=window)
+            plt.figure(figsize=(5, 4))
+            plt.semilogx(freqs, psd)
+            plt.title('PSD: of column {} window {}'.format(column, win_names[i]))
+            plt.xlabel('Frequency')
+            plt.ylabel('Power')
+            plt.tight_layout()
+            plt.show(block=False)
