@@ -38,7 +38,6 @@ def make_welch_psd(pdg, df):
 
     windows, win_names = make_windows(v_len)
 
-
     for column in df.columns:
         for i, window in enumerate(windows):
             freqs, psd = signal.welch(df[column].values, fs=fs, window=window)
@@ -49,3 +48,4 @@ def make_welch_psd(pdg, df):
             plt.ylabel('Power')
             plt.tight_layout()
             plt.show(block=False)
+            print("moi")
