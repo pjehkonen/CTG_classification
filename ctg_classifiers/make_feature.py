@@ -1,7 +1,7 @@
 from pathlib import Path
 import pandas as pd
 import numpy as np
-import scipy as sci
+from scipy import signal
 import matplotlib.pyplot as plt
 
 from sklearn import preprocessing

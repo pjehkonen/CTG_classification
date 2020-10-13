@@ -8,6 +8,8 @@ from ctg_lib import import_data
 from ctg_classifiers.random_train_test_indices import train_test_split
 from ctg_classifiers.make_feature import make_feats
 from ctg_lib.ctg_time import now_time_string
+from ctg_lib.spectrum import make_spectrogram, make_welch_psd
+from ctg_lib.demo_windows import make_demo
 
 
 
@@ -27,10 +29,13 @@ def main(pdg, classifier):
 
     # Read in dataframes
     normal_df, salt_df = import_data.import_data(False, my_env)
-
+    #make_spectrogram(pdg, salt_df)
+    make_demo(salt_df)
+    make_welch_psd(pdg, salt_df)
     # Create indices for elements available for training and testing
     X_train, X_test, y_train, y_test = train_test_split(pdg, my_env, logger, classifier, start_time,
                                                         normal_df.shape[1], salt_df.shape[1], split=0.2)
+
 
     make_feats(pdg, start_time, my_env, normal_df, salt_df, X_train, X_test, y_train, y_test)
 
