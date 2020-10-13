@@ -30,7 +30,7 @@ def main(pdg, classifier):
     # Read in dataframes
     normal_df, salt_df = import_data.import_data(False, my_env)
     #make_spectrogram(pdg, salt_df)
-    make_demo(salt_df)
+    #make_demo(salt_df)
     make_welch_psd(pdg, salt_df)
     # Create indices for elements available for training and testing
     X_train, X_test, y_train, y_test = train_test_split(pdg, my_env, logger, classifier, start_time,
