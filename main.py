@@ -2,16 +2,12 @@ import sys
 
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
-from ctg_lib import write_log
 from set_env_dirs import in_triton
 from ctg_lib import import_data
 from ctg_classifiers.random_train_test_indices import train_test_split
 from ctg_classifiers.make_feature import make_feats
 from ctg_lib.ctg_time import now_time_string
-from ctg_lib.spectrum import make_spectrogram, make_welch_psd
-from ctg_lib.demo_windows import make_demo
-
-
+from ctg_features.spectrum import make_welch_psd
 
 
 def main(pdg, classifier):
