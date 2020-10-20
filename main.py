@@ -1,16 +1,35 @@
 import sys
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
 from set_env_dirs import in_triton
 from ctg_lib import import_data
-from ctg_classifiers.random_train_test_indices import train_test_split
+#from ctg_classifiers.random_train_test_indices import train_test_split
 from ctg_classifiers.make_feature import make_feats
 from ctg_lib.ctg_time import now_time_string
 from ctg_features.spectrum import make_welch_psd
 
+def make_y_df(n_size, s_size):
+    y_array = np.zeros(n_size+s_size, dtype=int)
+    y_array[-s_size:] = 1
+    yy = {'y':y_array}
+    return pd.DataFrame(yy)
+    
+def demo_spect():
+    # make_spectrogram(pdg, salt_df)
+    # make_demo(salt_df)
+    # make_welch_psd(pdg, salt_df)
+    # Create indices for elements available for training and testing
+    return
 
 def main(pdg, classifier):
+
+    plt.style.use('ggplot')
+
     if in_triton.in_triton():
         sys.path.append('/scratch/cs/salka/PJ_SALKA/CTG_classification/ctg_lib')
         print("lib appended to Triton path")
@@ -25,15 +44,12 @@ def main(pdg, classifier):
 
     # Read in dataframes
     normal_df, salt_df = import_data.import_data(False, my_env)
-    #make_spectrogram(pdg, salt_df)
-    #make_demo(salt_df)
-    make_welch_psd(pdg, salt_df)
-    # Create indices for elements available for training and testing
-    X_train, X_test, y_train, y_test = train_test_split(pdg, my_env, logger, classifier, start_time,
-                                                        normal_df.shape[1], salt_df.shape[1], split=0.2)
 
+    X = pd.concat([normal_df, salt_df], ignore_index=True, axis=1).T
+    y = make_y_df(normal_df.shape[1],salt_df.shape[1])
 
-    make_feats(pdg, start_time, my_env, normal_df, salt_df, X_train, X_test, y_train, y_test)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
+
 
     print("All done here, with {}".format(out_dir))
     logger.info("Finalized script classifying {}".format(out_dir))
