@@ -1,8 +1,10 @@
-import sys
+import sys, os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, StratifiedShuffleSplit
+from sklearn.model_selection import GroupKFold
+from sklearn.neighbors import KNeighborsClassifier
 
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
@@ -45,10 +47,22 @@ def main(pdg, classifier):
     # Read in dataframes
     normal_df, salt_df = import_data.import_data(False, my_env)
 
+
     X = pd.concat([normal_df, salt_df], ignore_index=True, axis=1).T
     y = make_y_df(normal_df.shape[1],salt_df.shape[1])
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
+    os.environ['OMP_NUM_THREADS'] = '4'
+    nn_jobs = -1
+    nn_neighbors = 3
+
+    knn = KNeighborsClassifier(n_neighbors=nn_neighbors, n_jobs=nn_jobs)
+
+    N_FOLDS = 5
+    skf = StratifiedKFold(n_splits=N_FOLDS, shuffle=True)
+
+    skf_acc = cross_val_score(knn, X, y, cv=skf)
+    print(skf_acc)
+    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
 
 
     print("All done here, with {}".format(out_dir))
