@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, StratifiedShuffleSplit
 from sklearn.model_selection import GroupKFold
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn import metrics
 
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
@@ -51,19 +52,33 @@ def main(pdg, classifier):
     X = pd.concat([normal_df, salt_df], ignore_index=True, axis=1).T
     y = make_y_df(normal_df.shape[1],salt_df.shape[1])
 
+    # Now raw data is in X, where rows 0...normal_df.shape[1] contain cases with normal
+    # and rows rows loc[-salt_df.shape[1]:] contain ZigZag cases.
+
+    # Setting up classifier environment
     os.environ['OMP_NUM_THREADS'] = '4'
     nn_jobs = -1
+
+    # Make one shot split with shuffling enabled, otherwise splitting occurs linearly.
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, stratify=y)
+
+    # set up parameters for knn
     nn_neighbors = 3
-
+    nn_jobs = -1
     knn = KNeighborsClassifier(n_neighbors=nn_neighbors, n_jobs=nn_jobs)
+    knn.fit(X_train,y_train.values.ravel())
+    y_pred =knn.predict(X_test)
 
+    print("Tarkkuus:", metrics.accuracy_score(y_test.values.ravel(), y_pred))
+    print("Score: ", knn.score(X_test, y_test.values.ravel()))
+    ''''
     N_FOLDS = 5
     skf = StratifiedKFold(n_splits=N_FOLDS, shuffle=True)
 
     skf_acc = cross_val_score(knn, X, y, cv=skf)
     print(skf_acc)
     #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
-
+    '''
 
     print("All done here, with {}".format(out_dir))
     logger.info("Finalized script classifying {}".format(out_dir))
@@ -71,7 +86,7 @@ def main(pdg, classifier):
 
 if __name__ == '__main__':
     PrintDebuggingInfo = True
-    classifier = "LogisticRegression"
+    classifier = "K-NearestNeighbor"
 
     if PrintDebuggingInfo:
         print("Printing debugging information")
