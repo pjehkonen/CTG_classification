@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, StratifiedShuffleSplit
 from sklearn.model_selection import GroupKFold
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn import metrics
+from ctg_classifiers.KNN_classification import CTG_KNN
+
 
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
@@ -48,29 +48,30 @@ def main(pdg, classifier):
     # Read in dataframes
     normal_df, salt_df = import_data.import_data(False, my_env)
 
+    #X = pd.concat([normal_df, salt_df], ignore_index=True, axis=1).T
+    #y = make_y_df(normal_df.shape[1],salt_df.shape[1])
 
-    X = pd.concat([normal_df, salt_df], ignore_index=True, axis=1).T
-    y = make_y_df(normal_df.shape[1],salt_df.shape[1])
+    num_norm = 1000
+    num_salt = 40
+    norm_sub = normal_df.T.sample(num_norm)
+    salt_sub = salt_df.T.sample(num_salt)
+
+    X_sub = pd.concat([norm_sub, salt_sub], ignore_index=True, axis=0)
+    y_sub = np.zeros(num_norm+num_salt, dtype=int)
+    y_sub[num_norm:] = 1
+    print(y_sub)
 
     # Now raw data is in X, where rows 0...normal_df.shape[1] contain cases with normal
     # and rows rows loc[-salt_df.shape[1]:] contain ZigZag cases.
 
-    # Setting up classifier environment
-    os.environ['OMP_NUM_THREADS'] = '4'
-    nn_jobs = -1
-
     # Make one shot split with shuffling enabled, otherwise splitting occurs linearly.
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, stratify=y)
+    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(X_sub, y_sub, test_size=0.2, shuffle=True, stratify=y_sub)
 
+    print("moi")
     # set up parameters for knn
-    nn_neighbors = 3
-    nn_jobs = -1
-    knn = KNeighborsClassifier(n_neighbors=nn_neighbors, n_jobs=nn_jobs)
-    knn.fit(X_train,y_train.values.ravel())
-    y_pred =knn.predict(X_test)
+    CTG_KNN(X_train, X_test, y_train, y_test)
 
-    print("Tarkkuus:", metrics.accuracy_score(y_test.values.ravel(), y_pred))
-    print("Score: ", knn.score(X_test, y_test.values.ravel()))
     ''''
     N_FOLDS = 5
     skf = StratifiedKFold(n_splits=N_FOLDS, shuffle=True)
