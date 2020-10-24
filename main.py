@@ -33,7 +33,7 @@ def main(pdg, classifier):
 
     plt.style.use('ggplot')
 
-    RUN_REAL_DATA = False
+    RUN_REAL_DATA = True
 
     if in_triton.in_triton():
         sys.path.append('/scratch/cs/salka/PJ_SALKA/CTG_classification/ctg_lib')
