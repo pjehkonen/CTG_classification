@@ -51,8 +51,8 @@ def main(pdg, classifier):
     #X = pd.concat([normal_df, salt_df], ignore_index=True, axis=1).T
     #y = make_y_df(normal_df.shape[1],salt_df.shape[1])
 
-    num_norm = 1000
-    num_salt = 40
+    num_norm = 10000
+    num_salt = 200
     norm_sub = normal_df.T.sample(num_norm)
     salt_sub = salt_df.T.sample(num_salt)
 
@@ -68,9 +68,8 @@ def main(pdg, classifier):
     #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, stratify=y)
     X_train, X_test, y_train, y_test = train_test_split(X_sub, y_sub, test_size=0.2, shuffle=True, stratify=y_sub)
 
-    print("moi")
     # set up parameters for knn
-    CTG_KNN(X_train, X_test, y_train, y_test)
+    CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, my_env)
 
     ''''
     N_FOLDS = 5
