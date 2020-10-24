@@ -27,17 +27,16 @@ def plot_roc(fpr, tpr, classifier, logger=None, myEnv=None):
     if myEnv is None:
         plt.show();
     else:
-        plt.savefig(Path(myEnv.out_dir, time_now + "-" + classifier + ".png"))
+        plt.savefig(Path(myEnv.output_dir, time_now + "-" + classifier + ".png"))
 
 
 def log_results(logger, optimal, X_test, y_test, y_pred, y_pred_prob):
     logger.info("Accuracy is {}".format(optimal.score(X_test, y_test)))
     logger.info("Confusion matrix")
-    logger.info("{}".format(confusion_matrix(y_test, y_pred)))
+    logger.info("\n{}".format(confusion_matrix(y_test, y_pred)))
     logger.info("Classification report")
-    logger.info("{}".format(classification_report(y_test, y_pred)))
-    logger.info("Area under ROC")
-    logger.info("{}".format(roc_auc_score(y_test, y_pred_prob)))
+    logger.info("\n{}".format(classification_report(y_test, y_pred)))
+    logger.info("Area under ROC {}".format(roc_auc_score(y_test, y_pred_prob)))
 
 
 def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv):
@@ -66,8 +65,7 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv):
     knn_cv.fit(X_train, y_train)
 
     print(knn_cv.best_params_)
-    logger.info("Found best parameters as")
-    logger.info("{}".format(knn_cv.best_params_))
+    logger.info("Found best parameters {}".format(knn_cv.best_params_))
 
     # use best parameters
     logger.info("Creating optimal classifer with best parameters")
@@ -84,7 +82,7 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv):
     fpr, tpr, tresholds = roc_curve(y_test, y_pred_prob)
 
     logger.info("Calling figure generation with this classifier")
-    plot_roc(fpr, tpr, logger, classifier, myEnv)
+    plot_roc(fpr, tpr, classifier, logger, myEnv)
     logger.info("Figure generated")
 
     # Printing stuff

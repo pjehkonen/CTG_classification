@@ -19,8 +19,7 @@ from ctg_features.spectrum import make_welch_psd
 def make_y_df(n_size, s_size):
     y_array = np.zeros(n_size+s_size, dtype=int)
     y_array[-s_size:] = 1
-    yy = {'y':y_array}
-    return pd.DataFrame(yy)
+    return y_array
     
 def demo_spect():
     # make_spectrogram(pdg, salt_df)
@@ -32,6 +31,8 @@ def demo_spect():
 def main(pdg, classifier):
 
     plt.style.use('ggplot')
+
+    RUN_REAL_DATA = True
 
     if in_triton.in_triton():
         sys.path.append('/scratch/cs/salka/PJ_SALKA/CTG_classification/ctg_lib')
@@ -48,27 +49,41 @@ def main(pdg, classifier):
     # Read in dataframes
     normal_df, salt_df = import_data.import_data(False, my_env)
 
-    #X = pd.concat([normal_df, salt_df], ignore_index=True, axis=1).T
-    #y = make_y_df(normal_df.shape[1],salt_df.shape[1])
+    if RUN_REAL_DATA:
+        X = pd.concat([normal_df, salt_df], ignore_index=True, axis=1).T
+        y = make_y_df(normal_df.shape[1],salt_df.shape[1])
 
-    num_norm = 10000
-    num_salt = 200
-    norm_sub = normal_df.T.sample(num_norm)
-    salt_sub = salt_df.T.sample(num_salt)
+    else:
+        num_norm = 1000
+        num_salt = 50
+        norm_sub = normal_df.T.sample(num_norm)
+        salt_sub = salt_df.T.sample(num_salt)
 
-    X_sub = pd.concat([norm_sub, salt_sub], ignore_index=True, axis=0)
-    y_sub = np.zeros(num_norm+num_salt, dtype=int)
-    y_sub[num_norm:] = 1
-    print(y_sub)
+        X = pd.concat([norm_sub, salt_sub], ignore_index=True, axis=0)
+        y = np.zeros(num_norm+num_salt, dtype=int)
+        y[num_norm:] = 1
+
+    my_test_size = 0.2
+    use_shuffle = True
 
     # Now raw data is in X, where rows 0...normal_df.shape[1] contain cases with normal
     # and rows rows loc[-salt_df.shape[1]:] contain ZigZag cases.
 
     # Make one shot split with shuffling enabled, otherwise splitting occurs linearly.
     #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, stratify=y)
-    X_train, X_test, y_train, y_test = train_test_split(X_sub, y_sub, test_size=0.2, shuffle=True, stratify=y_sub)
+
+    logger.info("Generating test and train sets with split {} and suffling set to {}".format(my_test_size, use_shuffle))
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=my_test_size, shuffle=use_shuffle, stratify=y)
+
+    logger.info("X shape is    {}".format(X.shape))
+    logger.info("X_train shape {}".format(X_train.shape))
+    logger.info("X_test  shape {}".format(X_test.shape))
+    logger.info("y shape is    {}".format(y.shape))
+    logger.info("y_train shape {}".format(y_train.shape))
+    logger.info("y_test shape  {}".format(y_test.shape))
 
     # set up parameters for knn
+    logger.info("Calling ctg classifier {}".format(classifier))
     CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, my_env)
 
     ''''
