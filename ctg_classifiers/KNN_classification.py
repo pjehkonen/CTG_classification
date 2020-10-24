@@ -12,22 +12,21 @@ from pathlib import Path
 import os
 
 
-def plot_roc(fpr, tpr, classifier, logger=None, myEnv=None):
-    time_now = now_time_string()
-    if myEnv is None:
+def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
+    if my_env is None:
         logger.info("Displaying figure at IDE")
     else:
-        logger.info("Generating a figure at {} for {}".format(time_now, classifier))
+        logger.info("Generating a figure at {} for {}".format(start_time, classifier))
     plt.plot([0, 1], [0, 1], 'k--')
     plt.plot(fpr, tpr, label="AUC {}".format(auc(fpr, tpr)))
     plt.legend()
     plt.xlabel("False positive rate")
     plt.ylabel("True Positive Rate")
     plt.title("{} Regression Curve".format(classifier))
-    if myEnv is None:
+    if my_env is None:
         plt.show();
     else:
-        plt.savefig(Path(myEnv.output_dir, time_now + "-" + classifier + ".png"))
+        plt.savefig(Path(Path(my_env.log_dir, start_time), classifier + ".png"))
 
 
 def log_results(logger, optimal, X_test, y_test, y_pred, y_pred_prob):
@@ -39,10 +38,9 @@ def log_results(logger, optimal, X_test, y_test, y_pred, y_pred_prob):
     logger.info("Area under ROC {}".format(roc_auc_score(y_test, y_pred_prob)))
 
 
-def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv):
+def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_time):
     param_grid = {'n_neighbors': np.arange(1, 9)}
 
-    nn_neighbors = 5
     num_threads = '16'
     N_jobs = -1
     os.environ['OMP_NUM_THREADS'] = num_threads
@@ -51,24 +49,27 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv):
 
     knn = KNeighborsClassifier(n_jobs=nn_jobs)
 
+    print("Parameters set for environment and classifier")
     logger.info("Setting following parameters")
     logger.info("OMP_NUM_THREADS = {}".format(num_threads))
     logger.info("nn_jobs = {}".format(N_jobs))
     logger.info("cv = {}".format(N_cv))
 
-    knn_cv = GridSearchCV(knn, param_grid, cv=5)
+    knn_cv = GridSearchCV(knn, param_grid, cv=N_cv)
 
     logger.info("Using Grid search CV with parameters")
     logger.info("{}".format(param_grid))
 
     logger.info("Starting classifier grid search fit")
+    print("Starting Grid Search Cross validation")
     knn_cv.fit(X_train, y_train)
 
-    print(knn_cv.best_params_)
+    print("Found best parameters for {} which are {}".format(classifier,knn_cv.best_params_))
     logger.info("Found best parameters {}".format(knn_cv.best_params_))
 
     # use best parameters
-    logger.info("Creating optimal classifer with best parameters")
+    logger.info("Creating optimal classifier with best parameters")
+    print("Creating optimal filter")
     optimal = KNeighborsClassifier(**knn_cv.best_params_, n_jobs=nn_jobs)
     optimal.fit(X_train, y_train)
 
@@ -82,7 +83,8 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv):
     fpr, tpr, tresholds = roc_curve(y_test, y_pred_prob)
 
     logger.info("Calling figure generation with this classifier")
-    plot_roc(fpr, tpr, classifier, logger, myEnv)
+    print("Creating ROC curve")
+    plot_roc(fpr, tpr, classifier, logger, myEnv, start_time)
     logger.info("Figure generated")
 
     # Printing stuff
@@ -94,4 +96,5 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv):
     print("Area under ROC")
     print(roc_auc_score(y_test, y_pred_prob))
 
+    # Write same stuff to log
     log_results(logger, optimal, X_test, y_test, y_pred, y_pred_prob)

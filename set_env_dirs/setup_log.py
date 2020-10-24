@@ -2,8 +2,8 @@ import os
 import git
 import logging
 import sys
+from pathlib import Path
 
-from ctg_lib.ctg_time import now_time_string
 
 def setup_log(pdg, myEnv, start_time):
     os_info = os.uname()
@@ -11,7 +11,7 @@ def setup_log(pdg, myEnv, start_time):
     sha = repo.head.object.hexsha
 
 
-    logging.basicConfig(filename='{}/log_{}.log'.format(str(myEnv.log_dir), start_time),
+    logging.basicConfig(filename='{}/{}.log'.format(str(Path(myEnv.log_dir, start_time)), start_time),
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         level=logging.INFO,
                         datefmt='%Y-%m-%d %H:%M:%S')

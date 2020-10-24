@@ -1,6 +1,7 @@
 import sys, os
 import pandas as pd
 import numpy as np
+from pathlib import Path
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, StratifiedShuffleSplit
 from sklearn.model_selection import GroupKFold
@@ -32,7 +33,7 @@ def main(pdg, classifier):
 
     plt.style.use('ggplot')
 
-    RUN_REAL_DATA = True
+    RUN_REAL_DATA = False
 
     if in_triton.in_triton():
         sys.path.append('/scratch/cs/salka/PJ_SALKA/CTG_classification/ctg_lib')
@@ -69,9 +70,6 @@ def main(pdg, classifier):
     # Now raw data is in X, where rows 0...normal_df.shape[1] contain cases with normal
     # and rows rows loc[-salt_df.shape[1]:] contain ZigZag cases.
 
-    # Make one shot split with shuffling enabled, otherwise splitting occurs linearly.
-    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, stratify=y)
-
     logger.info("Generating test and train sets with split {} and suffling set to {}".format(my_test_size, use_shuffle))
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=my_test_size, shuffle=use_shuffle, stratify=y)
 
@@ -82,9 +80,13 @@ def main(pdg, classifier):
     logger.info("y_train shape {}".format(y_train.shape))
     logger.info("y_test shape  {}".format(y_test.shape))
 
+    np.savetxt(Path(my_env.log_dir,start_time+"/test_group.csv"),X_test.index.values, fmt="%d")
+    np.savetxt(Path(my_env.log_dir,start_time+"/train_group.csv"),X_test.index.values, fmt="%d")
+
+    logger.info("Test and Training indices written to log with this time_now as identifier")
     # set up parameters for knn
     logger.info("Calling ctg classifier {}".format(classifier))
-    CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, my_env)
+    CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, my_env, start_time)
 
     ''''
     N_FOLDS = 5
@@ -92,7 +94,7 @@ def main(pdg, classifier):
 
     skf_acc = cross_val_score(knn, X, y, cv=skf)
     print(skf_acc)
-    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
+
     '''
 
     print("All done here, with {}".format(out_dir))
