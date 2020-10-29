@@ -14,6 +14,7 @@ from pathlib import Path
 
 import os
 
+
 def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
     if my_env is None:
         logger.info("Displaying figure at IDE")
@@ -31,9 +32,41 @@ def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
         plt.savefig(Path(Path(my_env.log_dir, start_time), classifier + ".png"))
 
 
-def log_results(logger, cv, X_test, y_test, y_pred, y_pred_prob):
+def print_stuff(classifier, cv, X_test, y_test, y_pred, y_pred_prob):
+    print("**** Created ROC curve plot ****")
 
+    print("Found best parameters for {} which are {}".format(classifier, cv.best_params_))
+    print("Found best parameters {}".format(cv.best_params_))
+    print("Best score {}".format(cv.best_score_))
+    print("Best index {}".format(cv.best_index_))
+
+    print("Accuracy is ", cv.score(X_test, y_test))
+    print("Confusion matrix")
+    print(confusion_matrix(y_test, y_pred))
+    print("Classification report")
+    print(classification_report(y_test, y_pred))
+    print("Area under ROC")
+    print(roc_auc_score(y_test, y_pred_prob))
+    print("Found best parameters")
+    print("{}".format(cv.best_params_))
+
+
+def log_parameters(logger, max_neighbors, metrics, my_scoring, num_threads, N_jobs, N_cv):
+    logger.info("Setting following parameters")
+    logger.info("max_neighbors = {}".format(max_neighbors))
+    logger.info("metrics = {}".format(metrics))
+    logger.info("my_scoring = {}".format(my_scoring))
+    logger.info("OMP_NUM_THREADS = {}".format(num_threads))
+    logger.info("nn_jobs = {}".format(N_jobs))
+    logger.info("cv = {}".format(N_cv))
+
+
+def log_results(logger, cv, X_test, y_test, y_pred, y_pred_prob):
     logger.info("*********** Logging results  *****************")
+    logger.info("Found best parameters {}".format(cv.best_params_))
+    logger.info("Best score {}".format(cv.best_score_))
+    logger.info("Best index {}".format(cv.best_index_))
+
     logger.info("Accuracy is {}".format(cv.score(X_test, y_test)))
     logger.info("Confusion matrix")
     logger.info("\n{}".format(confusion_matrix(y_test, y_pred)))
@@ -44,6 +77,7 @@ def log_results(logger, cv, X_test, y_test, y_pred, y_pred_prob):
     for key in cv.cv_results_.keys():
         logger.info("key: {}".format(key))
         logger.info("values\n{}".format(cv.cv_results_[key]))
+
 
 def play_with_results(cv_object):
     pd.set_option("display.max_colwidth", None)
@@ -58,36 +92,37 @@ def play_with_results(cv_object):
 
 
 def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_time):
-
-
-    num_neighbors = np.arange(1, 15)
+    # Setting parameters for both hyperparameter search and criteria
+    max_neighbors = 50
+    num_neighbors = np.arange(1, max_neighbors)
     metrics = ["euclidean", "manhattan", "chebyshev"]
 
-    #parameter_grid = {'n_neighbors': num_neighbors, 'metric': metrics}
-    my_scoring = 'roc_auc' # "accuracy, neg_log_loss, jaccard, f1"
+    my_scoring = 'roc_auc'  # "accuracy, neg_log_loss, jaccard, f1"
 
+    # For Triton, break the wall
     num_threads = '16'
-    N_jobs = -1
     os.environ['OMP_NUM_THREADS'] = num_threads
+
+    # For my computer, use all processors
+    N_jobs = -1
     nn_jobs = N_jobs
-    N_cv = 5
+    N_cv = 8
 
-    #knn = KNeighborsClassifier(n_jobs=nn_jobs)
+    # knn = KNeighborsClassifier(n_jobs=nn_jobs)
+    # Make pipeline steps
     steps = [('scaler', StandardScaler()),
-             ('knn', KNeighborsClassifier())]
+             ('knn', KNeighborsClassifier())]  # <- change this to CVM and parameters below accordingly
+    # Make pipeline
     pipeline = Pipeline(steps)
-
+    # Define KNN_related grid search parameters
     parameters = {'knn__n_neighbors': num_neighbors,
-                  'knn__metric': metrics
-                  }
+                  'knn__metric': metrics}
 
     print("Parameters set for environment and classifier")
-    logger.info("Setting following parameters")
-    logger.info("OMP_NUM_THREADS = {}".format(num_threads))
-    logger.info("nn_jobs = {}".format(N_jobs))
-    logger.info("cv = {}".format(N_cv))
+    log_parameters(logger, max_neighbors, metrics, my_scoring, num_threads, N_jobs, N_cv)
 
-    knn_cv = GridSearchCV(
+    # Create Cross-Validation object for grid search
+    gs_cv = GridSearchCV(
         estimator=pipeline,
         param_grid=parameters,
         scoring=my_scoring,
@@ -98,49 +133,34 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     )
 
     logger.info("Using Grid search CV with parameters")
-    logger.info("{}".format(parameters))
-
+    logger.info("\n{}".format(parameters))
+    logger.info(
+        "gs_cv = GridSearchCV(estimator=pipeline, param_grid=parameters, scoring=my_scoring, n_jobs=nn_jobs, cv=N_cv, refit=True, return_train_score=True)")
     logger.info("Starting classifier grid search fit")
     print("Starting Grid Search Cross validation")
-    knn_cv.fit(X_train, y_train)
 
-    print("Found best parameters for {} which are {}".format(classifier, knn_cv.best_params_))
-    logger.info("Found best parameters {}".format(knn_cv.best_params_))
+    # Actual pipeline fit takes place here
+    gs_cv.fit(X_train, y_train)
 
-    play_with_results(knn_cv)
+    # play_with_results(gs_cv)
 
     # use best parameters    print("Found best parameters")
-    print("{}".format(knn_cv.best_params_))
-    logger.info("Creating optimal classifier with best parameters")
-    print("Creating optimal filter")
-    #optimal = KNeighborsClassifier(**knn_cv.best_params_, n_jobs=nn_jobs)
-    #optimal.fit(X_train, y_train)
+    # optimal = KNeighborsClassifier(**knn_cv.best_params_, n_jobs=nn_jobs)
+    # optimal.fit(X_train, y_train)
 
     logger.info("Calculating y_pred")
-    y_pred = knn_cv.predict(X_test)
+    y_pred = gs_cv.predict(X_test)
 
     logger.info("Calculating y_pred_prob")
-    y_pred_prob = knn_cv.predict_proba(X_test)[:, 1]
+    y_pred_prob = gs_cv.predict_proba(X_test)[:, 1]
 
     logger.info("Generating roc_curve with y_test, y_pred_prob")
     fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
 
-    logger.info("Calling figure generation with this classifier")
-    print("Creating ROC curve")
     plot_roc(fpr, tpr, classifier, logger, myEnv, start_time)
-    logger.info("Figure generated")
 
     # Printing stuff
-    print("Accuracy is ", knn_cv.score(X_test, y_test))
-    print("Confusion matrix")
-    print(confusion_matrix(y_test, y_pred))
-    print("Classification report")
-    print(classification_report(y_test, y_pred))
-    print("Area under ROC")
-    print(roc_auc_score(y_test, y_pred_prob))
-    print("Found best parameters")
-    print("{}".format(knn_cv.best_params_))
-
+    print_stuff(classifier, gs_cv, X_test, y_test, y_pred, y_pred_prob)
 
     # Write same stuff to log
-    log_results(logger, knn_cv, X_test, y_test, y_pred, y_pred_prob)
+    log_results(logger, gs_cv, X_test, y_test, y_pred, y_pred_prob)
