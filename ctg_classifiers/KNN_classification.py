@@ -14,7 +14,6 @@ from pathlib import Path
 
 import os
 
-
 def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
     if my_env is None:
         logger.info("Displaying figure at IDE")
@@ -34,6 +33,7 @@ def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
 
 def log_results(logger, cv, X_test, y_test, y_pred, y_pred_prob):
 
+    logger.info("*********** Logging results  *****************")
     logger.info("Accuracy is {}".format(cv.score(X_test, y_test)))
     logger.info("Confusion matrix")
     logger.info("\n{}".format(confusion_matrix(y_test, y_pred)))

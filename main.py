@@ -65,7 +65,7 @@ def main(pdg, classifier):
         y[num_norm:] = 1
     '''
 
-    X, y = base_feat(my_env)
+    X, y = base_feat(my_env, logger)
 
     my_test_size = 0.2
     use_shuffle = True
