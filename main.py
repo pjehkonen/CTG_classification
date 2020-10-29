@@ -6,22 +6,21 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, StratifiedShuffleSplit
 from sklearn.model_selection import GroupKFold
 from ctg_classifiers.KNN_classification import CTG_KNN
+from sklearn.preprocessing import StandardScaler
 
 
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
 from set_env_dirs import in_triton
+from ctg_features.base_features import base_feat
+
 from ctg_lib import import_data
 #from ctg_classifiers.random_train_test_indices import train_test_split
 from ctg_classifiers.make_feature import make_feats
 from ctg_lib.ctg_time import now_time_string
 from ctg_features.spectrum import make_welch_psd
 
-def make_y_df(n_size, s_size):
-    y_array = np.zeros(n_size+s_size, dtype=int)
-    y_array[-s_size:] = 1
-    return y_array
-    
+
 def demo_spect():
     # make_spectrogram(pdg, salt_df)
     # make_demo(salt_df)
@@ -47,6 +46,7 @@ def main(pdg, classifier):
 
     logger.info("This is log file for classification algorithm of {}".format(out_dir))
 
+    '''
     # Read in dataframes
     normal_df, salt_df = import_data.import_data(False, my_env)
 
@@ -63,6 +63,12 @@ def main(pdg, classifier):
         X = pd.concat([norm_sub, salt_sub], ignore_index=True, axis=0)
         y = np.zeros(num_norm+num_salt, dtype=int)
         y[num_norm:] = 1
+    '''
+
+    X, y = base_feat(my_env)
+
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
 
     my_test_size = 0.2
     use_shuffle = True
