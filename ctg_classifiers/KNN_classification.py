@@ -3,6 +3,8 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_curve, roc_auc_score, auc
 from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -56,9 +58,12 @@ def play_with_results(cv_object):
 
 
 def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_time):
-    max_neighbors = 15
+
+
+    num_neighbors = np.arange(1, 15)
     metrics = ["euclidean", "manhattan", "chebyshev"]
-    parameter_grid = {'n_neighbors': np.arange(1, max_neighbors + 1), 'metric': metrics}
+
+    #parameter_grid = {'n_neighbors': num_neighbors, 'metric': metrics}
     my_scoring = 'roc_auc' # "accuracy, neg_log_loss, jaccard, f1"
 
     num_threads = '16'
@@ -67,7 +72,14 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     nn_jobs = N_jobs
     N_cv = 5
 
-    knn = KNeighborsClassifier(n_jobs=nn_jobs)
+    #knn = KNeighborsClassifier(n_jobs=nn_jobs)
+    steps = [('scaler', StandardScaler()),
+             ('knn', KNeighborsClassifier())]
+    pipeline = Pipeline(steps)
+
+    parameters = {'knn__n_neighbors': num_neighbors,
+                  'knn__metric': metrics
+                  }
 
     print("Parameters set for environment and classifier")
     logger.info("Setting following parameters")
@@ -76,8 +88,8 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     logger.info("cv = {}".format(N_cv))
 
     knn_cv = GridSearchCV(
-        estimator=knn,
-        param_grid=parameter_grid,
+        estimator=pipeline,
+        param_grid=parameters,
         scoring=my_scoring,
         n_jobs=nn_jobs,
         cv=N_cv,
@@ -86,7 +98,7 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     )
 
     logger.info("Using Grid search CV with parameters")
-    logger.info("{}".format(parameter_grid))
+    logger.info("{}".format(parameters))
 
     logger.info("Starting classifier grid search fit")
     print("Starting Grid Search Cross validation")

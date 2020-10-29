@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, StratifiedShuffleSplit
 from sklearn.model_selection import GroupKFold
 from ctg_classifiers.KNN_classification import CTG_KNN
-from sklearn.preprocessing import StandardScaler
+
 
 
 from set_env_dirs import setup_env
@@ -66,9 +66,6 @@ def main(pdg, classifier):
     '''
 
     X, y = base_feat(my_env)
-
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
 
     my_test_size = 0.2
     use_shuffle = True
