@@ -3,6 +3,7 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_curve, roc_auc_score, auc
 from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import RandomizedSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -91,9 +92,26 @@ def play_with_results(cv_object):
     train_fields = [element for element in cols if 'train' in element]
 
 
+def make_grid_cv(pipeline, parameters, my_scoring, nn_jobs, N_cv, logger):
+    gs_cv = GridSearchCV(
+        estimator=pipeline,
+        param_grid=parameters,
+        scoring=my_scoring,
+        n_jobs=nn_jobs,
+        cv=N_cv,
+        refit=True,
+        return_train_score=True
+    )
+    logger.info("Using Grid search CV with parameters")
+    logger.info("\n{}".format(parameters))
+    logger.info(
+        "gs_cv = GridSearchCV(estimator=pipeline, param_grid=parameters, scoring=my_scoring, n_jobs=nn_jobs, cv=N_cv, refit=True, return_train_score=True)")
+    return gs_cv
+
+
 def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_time):
     # Setting parameters for both hyperparameter search and criteria
-    max_neighbors = 50
+    max_neighbors = 5
     num_neighbors = np.arange(1, max_neighbors)
     metrics = ["euclidean", "manhattan", "chebyshev"]
 
@@ -106,13 +124,12 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     # For my computer, use all processors
     N_jobs = -1
     nn_jobs = N_jobs
-    N_cv = 8
+    N_cv = 5
 
     # knn = KNeighborsClassifier(n_jobs=nn_jobs)
-    # Make pipeline steps
+    # Make pipeline with steps
     steps = [('scaler', StandardScaler()),
-             ('knn', KNeighborsClassifier())]  # <- change this to CVM and parameters below accordingly
-    # Make pipeline
+             ('knn', KNeighborsClassifier())]  # <- change this to SVM and parameters below accordingly
     pipeline = Pipeline(steps)
     # Define KNN_related grid search parameters
     parameters = {'knn__n_neighbors': num_neighbors,
@@ -121,26 +138,14 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     print("Parameters set for environment and classifier")
     log_parameters(logger, max_neighbors, metrics, my_scoring, num_threads, N_jobs, N_cv)
 
-    # Create Cross-Validation object for grid search
-    gs_cv = GridSearchCV(
-        estimator=pipeline,
-        param_grid=parameters,
-        scoring=my_scoring,
-        n_jobs=nn_jobs,
-        cv=N_cv,
-        refit=True,
-        return_train_score=True
-    )
+    # Make grid cv object
+    my_cv = make_grid_cv(pipeline, parameters, my_scoring, nn_jobs, N_cv, logger)
 
-    logger.info("Using Grid search CV with parameters")
-    logger.info("\n{}".format(parameters))
-    logger.info(
-        "gs_cv = GridSearchCV(estimator=pipeline, param_grid=parameters, scoring=my_scoring, n_jobs=nn_jobs, cv=N_cv, refit=True, return_train_score=True)")
-    logger.info("Starting classifier grid search fit")
-    print("Starting Grid Search Cross validation")
+    logger.info("Starting classifier search fit")
+    print("Starting Cross Validation")
 
     # Actual pipeline fit takes place here
-    gs_cv.fit(X_train, y_train)
+    my_cv.fit(X_train, y_train)
 
     # play_with_results(gs_cv)
 
@@ -148,19 +153,15 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     # optimal = KNeighborsClassifier(**knn_cv.best_params_, n_jobs=nn_jobs)
     # optimal.fit(X_train, y_train)
 
-    logger.info("Calculating y_pred")
-    y_pred = gs_cv.predict(X_test)
-
-    logger.info("Calculating y_pred_prob")
-    y_pred_prob = gs_cv.predict_proba(X_test)[:, 1]
+    y_pred = my_cv.predict(X_test)
+    y_pred_prob = my_cv.predict_proba(X_test)[:, 1]
 
     logger.info("Generating roc_curve with y_test, y_pred_prob")
     fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
-
     plot_roc(fpr, tpr, classifier, logger, myEnv, start_time)
 
     # Printing stuff
-    print_stuff(classifier, gs_cv, X_test, y_test, y_pred, y_pred_prob)
+    print_stuff(classifier, my_cv, X_test, y_test, y_pred, y_pred_prob)
 
     # Write same stuff to log
-    log_results(logger, gs_cv, X_test, y_test, y_pred, y_pred_prob)
+    log_results(logger, my_cv, X_test, y_test, y_pred, y_pred_prob)

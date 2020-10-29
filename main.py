@@ -28,6 +28,22 @@ def demo_spect():
     # Create indices for elements available for training and testing
     return
 
+
+def logging_data(logger, X, X_train, X_test, y, y_train, y_test, my_env, start_time):
+    logger.info("X shape is    {}".format(X.shape))
+    logger.info("X_train shape {}".format(X_train.shape))
+    logger.info("X_test  shape {}".format(X_test.shape))
+    logger.info("y shape is    {}".format(y.shape))
+    logger.info("y_train shape {}".format(y_train.shape))
+    logger.info("y_test shape  {}".format(y_test.shape))
+    logger.info("Number of ZigZags in training set {}".format(np.sum(y_train)))
+    logger.info("Number of ZigZags in test set     {}".format(np.sum(y_test)))
+
+    np.savetxt(Path(my_env.log_dir,start_time+"/test_group.csv"),X_test.index.values, fmt="%d")
+    np.savetxt(Path(my_env.log_dir,start_time+"/train_group.csv"),X_train.index.values, fmt="%d")
+
+    logger.info("Test and Training indices written to log with this time_now as identifier")
+
 def main(pdg, classifier):
 
     plt.style.use('ggplot')
@@ -76,17 +92,8 @@ def main(pdg, classifier):
     logger.info("Generating test and train sets with split {} and suffling set to {}".format(my_test_size, use_shuffle))
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=my_test_size, shuffle=use_shuffle, stratify=y)
 
-    logger.info("X shape is    {}".format(X.shape))
-    logger.info("X_train shape {}".format(X_train.shape))
-    logger.info("X_test  shape {}".format(X_test.shape))
-    logger.info("y shape is    {}".format(y.shape))
-    logger.info("y_train shape {}".format(y_train.shape))
-    logger.info("y_test shape  {}".format(y_test.shape))
+    logging_data(logger, X, X_train, X_test, y, y_train, y_test, my_env, start_time)
 
-    np.savetxt(Path(my_env.log_dir,start_time+"/test_group.csv"),X_test.index.values, fmt="%d")
-    np.savetxt(Path(my_env.log_dir,start_time+"/train_group.csv"),X_train.index.values, fmt="%d")
-
-    logger.info("Test and Training indices written to log with this time_now as identifier")
     # set up parameters for knn
     logger.info("Calling ctg classifier {}".format(classifier))
     CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, my_env, start_time)
