@@ -84,7 +84,7 @@ def main(pdg, classifier):
     logger.info("y_test shape  {}".format(y_test.shape))
 
     np.savetxt(Path(my_env.log_dir,start_time+"/test_group.csv"),X_test.index.values, fmt="%d")
-    np.savetxt(Path(my_env.log_dir,start_time+"/train_group.csv"),X_test.index.values, fmt="%d")
+    np.savetxt(Path(my_env.log_dir,start_time+"/train_group.csv"),X_train.index.values, fmt="%d")
 
     logger.info("Test and Training indices written to log with this time_now as identifier")
     # set up parameters for knn
