@@ -33,5 +33,7 @@ author::
 Input dataformat
 ----------------
 Input data format:
-- X: pd.DataFrame(cols=observations, rows=time samples).
-- y: vector, where 0 means no high variability and 1 means high variability.
+
+- X: pd.DataFrame, shape (M, N) s.t. (M = time samples, N=observations).
+
+- y: binary vector, shape (M,), where **0** == no high variability and **1** == high variability.
