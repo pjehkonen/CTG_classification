@@ -8,26 +8,41 @@ from sklearn.model_selection import GroupKFold
 from ctg_classifiers.KNN_classification import CTG_KNN
 
 
+
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
 from set_env_dirs import in_triton
+from ctg_features.base_features import base_feat
+
 from ctg_lib import import_data
 #from ctg_classifiers.random_train_test_indices import train_test_split
 from ctg_classifiers.make_feature import make_feats
 from ctg_lib.ctg_time import now_time_string
 from ctg_features.spectrum import make_welch_psd
 
-def make_y_df(n_size, s_size):
-    y_array = np.zeros(n_size+s_size, dtype=int)
-    y_array[-s_size:] = 1
-    return y_array
-    
+
 def demo_spect():
     # make_spectrogram(pdg, salt_df)
     # make_demo(salt_df)
     # make_welch_psd(pdg, salt_df)
     # Create indices for elements available for training and testing
     return
+
+
+def logging_data(logger, X, X_train, X_test, y, y_train, y_test, my_env, start_time):
+    logger.info("X shape is    {}".format(X.shape))
+    logger.info("X_train shape {}".format(X_train.shape))
+    logger.info("X_test  shape {}".format(X_test.shape))
+    logger.info("y shape is    {}".format(y.shape))
+    logger.info("y_train shape {}".format(y_train.shape))
+    logger.info("y_test shape  {}".format(y_test.shape))
+    logger.info("Number of ZigZags in training set {}".format(np.sum(y_train)))
+    logger.info("Number of ZigZags in test set     {}".format(np.sum(y_test)))
+
+    np.savetxt(Path(my_env.log_dir,start_time+"/test_group.csv"),X_test.index.values, fmt="%d")
+    np.savetxt(Path(my_env.log_dir,start_time+"/train_group.csv"),X_train.index.values, fmt="%d")
+
+    logger.info("Test and Training indices written to log with this time_now as identifier")
 
 def main(pdg, classifier):
 
@@ -47,6 +62,7 @@ def main(pdg, classifier):
 
     logger.info("This is log file for classification algorithm of {}".format(out_dir))
 
+    '''
     # Read in dataframes
     normal_df, salt_df = import_data.import_data(False, my_env)
 
@@ -63,6 +79,9 @@ def main(pdg, classifier):
         X = pd.concat([norm_sub, salt_sub], ignore_index=True, axis=0)
         y = np.zeros(num_norm+num_salt, dtype=int)
         y[num_norm:] = 1
+    '''
+
+    X, y = base_feat(my_env, logger)
 
     my_test_size = 0.2
     use_shuffle = True
@@ -73,17 +92,8 @@ def main(pdg, classifier):
     logger.info("Generating test and train sets with split {} and suffling set to {}".format(my_test_size, use_shuffle))
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=my_test_size, shuffle=use_shuffle, stratify=y)
 
-    logger.info("X shape is    {}".format(X.shape))
-    logger.info("X_train shape {}".format(X_train.shape))
-    logger.info("X_test  shape {}".format(X_test.shape))
-    logger.info("y shape is    {}".format(y.shape))
-    logger.info("y_train shape {}".format(y_train.shape))
-    logger.info("y_test shape  {}".format(y_test.shape))
+    logging_data(logger, X, X_train, X_test, y, y_train, y_test, my_env, start_time)
 
-    np.savetxt(Path(my_env.log_dir,start_time+"/test_group.csv"),X_test.index.values, fmt="%d")
-    np.savetxt(Path(my_env.log_dir,start_time+"/train_group.csv"),X_test.index.values, fmt="%d")
-
-    logger.info("Test and Training indices written to log with this time_now as identifier")
     # set up parameters for knn
     logger.info("Calling ctg classifier {}".format(classifier))
     CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, my_env, start_time)
