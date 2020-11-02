@@ -2,6 +2,7 @@ import platform
 import os
 from pathlib import Path
 
+
 # Class to work as directory element
 
 def path_content(directory, suffix):
@@ -38,6 +39,7 @@ class CTGPaths:
     info_dir_content()
         Prints contents of INFO directory
     """
+
     def __init__(self, i_dir=None, o_dir=None, l_dir=None, f_dir=None):
 
         self.__worker = platform.node()
@@ -304,6 +306,5 @@ class DirectoryMissingError(Exception):
 if __name__ == '__main__':
     myEnv = CTGPaths("/my/input", "/my/output", "/my/log")
     print(myEnv)
-    myEnv.path_content(myEnv.input_dir,"csv")
+    myEnv.input_dir_files("csv")
     raise DirectoryMissingError('Hulabula')
-
