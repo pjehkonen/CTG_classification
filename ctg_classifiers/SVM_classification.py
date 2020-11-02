@@ -119,7 +119,7 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     my_degrees = [3, 4, 5]
     my_cache_size = 2000
     my_class_weight = 'balanced'
-    my_max_iter = 100000
+    my_max_iter = 1000000
 
     # For Triton, break the wall
     num_threads = '16'
