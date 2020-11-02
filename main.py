@@ -28,13 +28,13 @@ def demo_spect():
     return
 
 
-def fast_data(my_env):
+def fast_data(my_env, dset_size):
 
     # This is to sample very short subset of data for testing classifier.
     normal_df, salt_df = import_data.import_data(False, my_env)
 
-    num_norm = 1000
-    num_salt = 50
+    num_norm = dset_size
+    num_salt = int(dset_size/100)
 
     norm_sub = normal_df.T.sample(num_norm)
     salt_sub = salt_df.T.sample(num_salt)
@@ -77,8 +77,8 @@ def main(pdg, classifier):
 
     logger.info("This is log file for classification algorithm of {}".format(out_dir))
 
-    #X, y = base_feat(my_env, logger)
-    X, y = fast_data(my_env)
+    X, y = base_feat(my_env, logger)
+    #X, y = fast_data(my_env, 10000)
 
     my_test_size = 0.2
     use_shuffle = True
@@ -115,7 +115,7 @@ def main(pdg, classifier):
 if __name__ == '__main__':
     PrintDebuggingInfo = True
     classifiers = ["K-NearestNeighbor", "SupportVectorClassifier"]
-    classifier = classifiers[1]
+    classifier = classifiers[0]
 
     if PrintDebuggingInfo:
         print("Printing debugging information")

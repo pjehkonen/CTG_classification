@@ -119,7 +119,7 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     my_degrees = [3, 4, 5]
     my_cache_size = 2000
     my_class_weight = 'balanced'
-    my_max_iter = 1000000
+    my_max_iter = 100000
 
     # For Triton, break the wall
     num_threads = '16'
@@ -134,7 +134,7 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
 
     # Make pipeline with steps
     steps = [('scaler', StandardScaler()),
-             ('svc', SVC(probability=True, cache_size=my_cache_size, max_iter=my_max_iter, class_weight='balanced'))]
+             ('svc', SVC(kernel='linear', probability=True, cache_size=my_cache_size, max_iter=my_max_iter, class_weight='balanced'))]
     pipeline = Pipeline(steps)
 
     # Define SVC_related grid search parameters
