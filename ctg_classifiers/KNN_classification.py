@@ -10,7 +10,7 @@ from sklearn.preprocessing import StandardScaler
 from ctg_lib.ctg_path_env import in_triton
 
 import matplotlib
-if not in_triton():
+if in_triton():
     matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
