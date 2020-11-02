@@ -134,7 +134,7 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
 
     # Make pipeline with steps
     steps = [('scaler', StandardScaler()),
-             ('svc', SVC(kernel='linear', probability=True, cache_size=my_cache_size, max_iter=my_max_iter, class_weight='balanced'))]
+             ('svc', SVC(kernel='rbf', probability=True, cache_size=my_cache_size, max_iter=my_max_iter, class_weight='balanced'))]
     pipeline = Pipeline(steps)
 
     # Define SVC_related grid search parameters
@@ -143,7 +143,7 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
                   }
 
     print("Parameters set for environment and classifier")
-    log_svc_parameters(logger, my_C_params, kernels, my_degrees, my_cache_size, my_max_iter, my_class_weight)
+    log_svc_parameters(logger, my_C_params, 'rbf', my_degrees, my_cache_size, my_max_iter, my_class_weight)
 
     # Make grid cv object
     my_cv = make_grid_cv_svc(pipeline, parameters, my_scoring, nn_jobs, N_cv, logger)

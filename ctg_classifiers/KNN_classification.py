@@ -16,6 +16,12 @@ from pathlib import Path
 import os
 
 
+def in_triton():
+    if os.path.exists('/scratch'):
+        return True
+    else:
+        return False
+
 def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
     if my_env is None:
         logger.info("Displaying figure at IDE")
@@ -27,7 +33,7 @@ def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
     plt.xlabel("False positive rate")
     plt.ylabel("True Positive Rate")
     plt.title("{} Regression Curve".format(classifier))
-    if my_env is None:
+    if my_env is None and not in_triton():
         plt.show()
     else:
         plt.savefig(Path(Path(my_env.log_dir, start_time), classifier + ".png"))
