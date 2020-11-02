@@ -7,7 +7,13 @@ from sklearn.model_selection import RandomizedSearchCV
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.preprocessing import StandardScaler
 
+from ctg_lib.ctg_path_env import in_triton
+
+import matplotlib
+if in_triton():
+    matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
 import numpy as np
 import pandas as pd
 
@@ -27,10 +33,7 @@ def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
     plt.xlabel("False positive rate")
     plt.ylabel("True Positive Rate")
     plt.title("{} Regression Curve".format(classifier))
-    if my_env is None and not in_triton():
-        plt.show()
-    else:
-        plt.savefig(Path(Path(my_env.log_dir, start_time), classifier + ".png"))
+    plt.savefig(Path(Path(my_env.log_dir, start_time), classifier + ".png"))
 
 
 def print_stuff(classifier, cv, X_test, y_test, y_pred, y_pred_prob):
@@ -122,19 +125,20 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     my_max_iter = 1000000
 
     # For Triton, break the wall
-    num_threads = '16'
+    num_threads = '32'
     os.environ['OMP_NUM_THREADS'] = num_threads
 
 
     # Pipeline settings
     N_jobs = -1 # use all cores
     nn_jobs = N_jobs
-    N_cv = 5  # Number of cross validations in Grid Search
+    N_cv = 7  # Number of cross validations in Grid Search
     my_scoring = 'roc_auc'  # Metric from list of "roc_auc, accuracy, neg_log_loss, jaccard, f1"
+    my_kernel = 'rbf'
 
     # Make pipeline with steps
     steps = [('scaler', StandardScaler()),
-             ('svc', SVC(kernel='rbf', probability=True, cache_size=my_cache_size, max_iter=my_max_iter, class_weight='balanced'))]
+             ('svc', SVC(kernel=my_kernel, probability=True, cache_size=my_cache_size, max_iter=my_max_iter, class_weight='balanced'))]
     pipeline = Pipeline(steps)
 
     # Define SVC_related grid search parameters
@@ -143,7 +147,7 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
                   }
 
     print("Parameters set for environment and classifier")
-    log_svc_parameters(logger, my_C_params, 'rbf', my_degrees, my_cache_size, my_max_iter, my_class_weight)
+    log_svc_parameters(logger, my_C_params, my_kernel, my_degrees, my_cache_size, my_max_iter, my_class_weight)
 
     # Make grid cv object
     my_cv = make_grid_cv_svc(pipeline, parameters, my_scoring, nn_jobs, N_cv, logger)

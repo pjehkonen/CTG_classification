@@ -117,7 +117,7 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     num_neighbors = np.arange(1, max_neighbors)
     metrics = ["euclidean", "manhattan", "chebyshev"]
 
-    my_scoring = 'roc_auc'  # "accuracy, neg_log_loss, jaccard, f1"
+    my_scoring = 'f1'  # among options "roc_auc, accuracy, neg_log_loss, jaccard, f1"
 
     # For Triton, break the wall
     num_threads = '32'
