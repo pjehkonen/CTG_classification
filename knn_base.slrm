@@ -1,11 +1,11 @@
 #!/bin/bash
 #SBATCH --job-name=CTG_KNN
-#SBATCH -c 16
+#SBATCH -c 32
 #SBATCH -t 24:00:00
 #SBATCH --mem=16000
 #SBATCH --output=/scratch/cs/salka/scratch/knn.%j.out
 
-export NUMEXPR_MAX_THREADS=16
+export NUMEXPR_MAX_THREADS=32
 
 module load anaconda
 
