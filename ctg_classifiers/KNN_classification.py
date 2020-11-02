@@ -11,16 +11,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from pathlib import Path
+from ctg_lib.ctg_path_env import in_triton
 
+from pathlib import Path
 import os
 
-
-def in_triton():
-    if os.path.exists('/scratch'):
-        return True
-    else:
-        return False
 
 def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
     if my_env is None:

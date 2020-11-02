@@ -12,9 +12,9 @@ import numpy as np
 import pandas as pd
 
 from pathlib import Path
-
 import os
 
+from ctg_lib.ctg_path_env import in_triton
 
 def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
     if my_env is None:
@@ -27,7 +27,7 @@ def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
     plt.xlabel("False positive rate")
     plt.ylabel("True Positive Rate")
     plt.title("{} Regression Curve".format(classifier))
-    if my_env is None:
+    if my_env is None and not in_triton():
         plt.show()
     else:
         plt.savefig(Path(Path(my_env.log_dir, start_time), classifier + ".png"))
