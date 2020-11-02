@@ -6,8 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, StratifiedShuffleSplit
 from sklearn.model_selection import GroupKFold
 from ctg_classifiers.KNN_classification import CTG_KNN
-
-
+from ctg_classifiers.SVM_classification import CTG_SVC
 
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
@@ -29,6 +28,24 @@ def demo_spect():
     return
 
 
+def fast_data(my_env):
+
+    # This is to sample very short subset of data for testing classifier.
+    normal_df, salt_df = import_data.import_data(False, my_env)
+
+    num_norm = 1000
+    num_salt = 50
+
+    norm_sub = normal_df.T.sample(num_norm)
+    salt_sub = salt_df.T.sample(num_salt)
+
+    X = pd.concat([norm_sub, salt_sub], ignore_index=True, axis=0)
+    y = np.zeros(num_norm+num_salt, dtype=int)
+    y[num_norm:] = 1
+
+    return X, y
+
+
 def logging_data(logger, X, X_train, X_test, y, y_train, y_test, my_env, start_time):
     logger.info("X shape is    {}".format(X.shape))
     logger.info("X_train shape {}".format(X_train.shape))
@@ -48,8 +65,6 @@ def main(pdg, classifier):
 
     plt.style.use('ggplot')
 
-    RUN_REAL_DATA = True
-
     if in_triton.in_triton():
         sys.path.append('/scratch/cs/salka/PJ_SALKA/CTG_classification/ctg_lib')
         print("lib appended to Triton path")
@@ -62,26 +77,8 @@ def main(pdg, classifier):
 
     logger.info("This is log file for classification algorithm of {}".format(out_dir))
 
-    '''
-    # Read in dataframes
-    normal_df, salt_df = import_data.import_data(False, my_env)
-
-    if RUN_REAL_DATA:
-        X = pd.concat([normal_df, salt_df], ignore_index=True, axis=1).T
-        y = make_y_df(normal_df.shape[1],salt_df.shape[1])
-
-    else:
-        num_norm = 1000
-        num_salt = 50
-        norm_sub = normal_df.T.sample(num_norm)
-        salt_sub = salt_df.T.sample(num_salt)
-
-        X = pd.concat([norm_sub, salt_sub], ignore_index=True, axis=0)
-        y = np.zeros(num_norm+num_salt, dtype=int)
-        y[num_norm:] = 1
-    '''
-
-    X, y = base_feat(my_env, logger)
+    #X, y = base_feat(my_env, logger)
+    X, y = fast_data(my_env)
 
     my_test_size = 0.2
     use_shuffle = True
@@ -96,7 +93,11 @@ def main(pdg, classifier):
 
     # set up parameters for knn
     logger.info("Calling ctg classifier {}".format(classifier))
-    CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, my_env, start_time)
+
+    if classifier=="K-NearestNeighbor":
+        CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, my_env, start_time)
+    elif classifier=="SupportVectorClassifier":
+        CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, my_env, start_time)
 
     ''''
     N_FOLDS = 5
@@ -113,7 +114,8 @@ def main(pdg, classifier):
 
 if __name__ == '__main__':
     PrintDebuggingInfo = True
-    classifier = "K-NearestNeighbor"
+    classifiers = ["K-NearestNeighbor", "SupportVectorClassifier"]
+    classifier = classifiers[1]
 
     if PrintDebuggingInfo:
         print("Printing debugging information")
