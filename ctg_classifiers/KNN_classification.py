@@ -28,10 +28,10 @@ def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
     plt.xlabel("False positive rate")
     plt.ylabel("True Positive Rate")
     plt.title("{} Regression Curve".format(classifier))
-    if my_env is None and not in_triton():
-        plt.show()
-    else:
-        plt.savefig(Path(Path(my_env.log_dir, start_time), classifier + ".png"))
+    #if not in_triton():
+    #    plt.show()
+    #else:
+    plt.savefig(Path(Path(my_env.log_dir, start_time), classifier + ".png"))
 
 
 def print_stuff(classifier, cv, X_test, y_test, y_pred, y_pred_prob):
