@@ -113,7 +113,7 @@ def make_grid_cv(pipeline, parameters, my_scoring, nn_jobs, N_cv, logger):
 
 def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_time):
     # Setting parameters for both hyperparameter search and criteria
-    max_neighbors = 3
+    max_neighbors = 99
     num_neighbors = np.arange(1, max_neighbors)
     metrics = ["euclidean", "manhattan", "chebyshev"]
 
@@ -126,7 +126,7 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     # For my computer, use all processors
     N_jobs = -1
     nn_jobs = N_jobs
-    N_cv = 2
+    N_cv = 7
 
     # knn = KNeighborsClassifier(n_jobs=nn_jobs)
     # Make pipeline with steps
