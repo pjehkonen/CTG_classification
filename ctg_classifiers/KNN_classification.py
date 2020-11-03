@@ -6,6 +6,8 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import plot_confusion_matrix
+
 from joblib import dump, load
 
 from ctg_lib.ctg_path_env import in_triton
@@ -21,18 +23,47 @@ from pathlib import Path
 import os
 
 
-def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
+def plot_matrix(my_cv, X_test, y_test, classifier, my_scoring,  my_env, start_time):
+    plt.style.use('default')
+    fig = plt.figure(figsize=(8,8), dpi=150)
+
+    my_title = "{} Confusion Matrix ({})".format(classifier, my_scoring)
+    class_names = ['normal','zigzag']
+    plot_confusion_matrix(my_cv, X_test, y_test,
+                                 display_labels=class_names,
+                                 cmap=plt.cm.Blues,
+                                 normalize=None)
+    plt.title(my_title)
+
+    plt.savefig(Path(Path(my_env.log_dir, start_time), 'CF_unnormalized_'+classifier + ".png"))
+    print(my_title)
+    print(confusion_matrix)
+
+    plot_confusion_matrix(my_cv, X_test, y_test,
+                                 display_labels=class_names,
+                                 cmap=plt.cm.Blues,
+                                 normalize='all')
+    plt.title(my_title)
+
+    plt.savefig(Path(Path(my_env.log_dir, start_time), 'CF_normalized_'+classifier + ".png"))
+
+
+
+
+def plot_roc(fpr, tpr, classifier, my_scoring, logger=None, my_env=None, start_time=None):
     if my_env is None:
         logger.info("Displaying figure at IDE")
     else:
         logger.info("Generating a figure at {} for {}".format(start_time, classifier))
+
+    fig = plt.figure(figsize=(10,10), dpi=100)
     plt.plot([0, 1], [0, 1], 'k--')
-    plt.plot(fpr, tpr, label="AUC {}".format(auc(fpr, tpr)))
+    plt.plot(fpr, tpr, label="AUC {:.4f}".format(auc(fpr, tpr)))
     plt.legend()
     plt.xlabel("False positive rate")
     plt.ylabel("True Positive Rate")
-    plt.title("{} Regression Curve".format(classifier))
-    plt.savefig(Path(Path(my_env.log_dir, start_time), classifier + ".png"))
+    plt.title("{} AUC ({})".format(classifier, my_scoring))
+    plt.savefig(Path(Path(my_env.log_dir, start_time), 'AUC_'+classifier + ".png"))
 
 
 def print_stuff(classifier, cv, my_scoring, X_test, y_test, y_pred, y_pred_prob):
@@ -115,6 +146,8 @@ def make_grid_cv(pipeline, parameters, my_scoring, nn_jobs, N_cv, logger):
 def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_time):
     # Setting parameters for both hyperparameter search and criteria
     max_neighbors = int(y_test.sum()/10) # Give chance for zigzag to have friends
+    if max_neighbors==0:
+        max_neighbors = 3
     num_neighbors = np.arange(1, max_neighbors,2) # take odd numbers only
     metrics = ["euclidean", "manhattan", "chebyshev"]
 
@@ -164,7 +197,8 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
 
     logger.info("Generating roc_curve with y_test, y_pred_prob")
     fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
-    plot_roc(fpr, tpr, classifier, logger, myEnv, start_time)
+    plot_roc(fpr, tpr, classifier, my_scoring, logger, myEnv, start_time)
+    plot_matrix(my_cv, X_test, y_test, classifier, my_scoring, myEnv, start_time)
 
     # Printing stuff
     print_stuff(classifier, my_cv, my_scoring, X_test, y_test, y_pred, y_pred_prob)
