@@ -77,8 +77,8 @@ def main(pdg, classifier):
 
     logger.info("This is log file for classification algorithm of {}".format(out_dir))
 
-    #X, y = base_feat(my_env, logger)
-    X, y = fast_data(my_env, 1000)
+    X, y = base_feat(my_env, logger)
+    #X, y = fast_data(my_env, 1000)
 
     my_test_size = 0.2
     use_shuffle = True
