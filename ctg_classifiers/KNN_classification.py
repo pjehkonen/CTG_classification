@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-
 from pathlib import Path
 import os
 
@@ -36,7 +35,7 @@ def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
     plt.savefig(Path(Path(my_env.log_dir, start_time), classifier + ".png"))
 
 
-def print_stuff(classifier, cv, X_test, y_test, y_pred, y_pred_prob):
+def print_stuff(classifier, cv, my_scoring, X_test, y_test, y_pred, y_pred_prob):
     print("**** Created ROC curve plot ****")
 
     print("Found best parameters for {} which are {}".format(classifier, cv.best_params_))
@@ -44,6 +43,7 @@ def print_stuff(classifier, cv, X_test, y_test, y_pred, y_pred_prob):
     print("Best score {}".format(cv.best_score_))
     print("Best index {}".format(cv.best_index_))
 
+    print("Metric applied as target: {}".format(my_scoring))
     print("Accuracy is ", cv.score(X_test, y_test))
     print("Confusion matrix")
     print(confusion_matrix(y_test, y_pred))
@@ -114,11 +114,11 @@ def make_grid_cv(pipeline, parameters, my_scoring, nn_jobs, N_cv, logger):
 
 def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_time):
     # Setting parameters for both hyperparameter search and criteria
-    max_neighbors = 99
-    num_neighbors = np.arange(1, max_neighbors)
+    max_neighbors = int(y_test.sum()/10) # Give chance for zigzag to have friends
+    num_neighbors = np.arange(1, max_neighbors,2) # take odd numbers only
     metrics = ["euclidean", "manhattan", "chebyshev"]
 
-    my_scoring = 'f1'  # among options "roc_auc, accuracy, neg_log_loss, jaccard, f1"
+    my_scoring = 'roc_auc'  # among options "roc_auc, accuracy, neg_log_loss, jaccard, f1"
 
     # For Triton, break the wall
     num_threads = '32'
@@ -157,7 +157,7 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     # optimal.fit(X_train, y_train)
 
     # Save classifier to current log-file location
-    dump(my_cv, Path(myEnv.log_dir, classifier+start_time +'.joblib'))
+    dump(my_cv, Path(myEnv.log_dir, classifier+'_'+start_time +'.joblib'))
 
     y_pred = my_cv.predict(X_test)
     y_pred_prob = my_cv.predict_proba(X_test)[:, 1]
@@ -167,7 +167,7 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     plot_roc(fpr, tpr, classifier, logger, myEnv, start_time)
 
     # Printing stuff
-    print_stuff(classifier, my_cv, X_test, y_test, y_pred, y_pred_prob)
+    print_stuff(classifier, my_cv, my_scoring, X_test, y_test, y_pred, y_pred_prob)
 
     # Write same stuff to log
     log_results(logger, my_cv, X_test, y_test, y_pred, y_pred_prob)

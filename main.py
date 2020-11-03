@@ -78,7 +78,7 @@ def main(pdg, classifier):
     logger.info("This is log file for classification algorithm of {}".format(out_dir))
 
     X, y = base_feat(my_env, logger)
-    #X, y = fast_data(my_env, 10000)
+    #X, y = fast_data(my_env, 1000)
 
     my_test_size = 0.2
     use_shuffle = True
@@ -115,7 +115,7 @@ def main(pdg, classifier):
 if __name__ == '__main__':
     PrintDebuggingInfo = True
     classifiers = ["K-NearestNeighbor", "SupportVectorClassifier"]
-    classifier = classifiers[1]
+    classifier = classifiers[0]
 
     if PrintDebuggingInfo:
         print("Printing debugging information")

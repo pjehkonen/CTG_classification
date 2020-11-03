@@ -37,13 +37,15 @@ def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
     plt.savefig(Path(Path(my_env.log_dir, start_time), classifier + ".png"))
 
 
-def print_stuff(classifier, cv, X_test, y_test, y_pred, y_pred_prob):
+def print_stuff(classifier, cv, my_scoring, X_test, y_test, y_pred, y_pred_prob):
     print("**** Created ROC curve plot ****")
 
     print("Found best parameters for {} which are {}".format(classifier, cv.best_params_))
     print("Found best parameters {}".format(cv.best_params_))
     print("Best score {}".format(cv.best_score_))
     print("Best index {}".format(cv.best_index_))
+
+    print("Metric applied as target: {}".format(my_scoring))
 
     print("Accuracy is ", cv.score(X_test, y_test))
     print("Confusion matrix")
@@ -160,7 +162,7 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     # Actual pipeline fit takes place here
     my_cv.fit(X_train, y_train)
 
-    dump(my_cv, Path(myEnv.log_dir, classifier + start_time + '.joblib'))
+    dump(my_cv, Path(myEnv.log_dir, classifier+'_'+start_time +'.joblib'))
 
     y_pred = my_cv.predict(X_test)
     y_pred_prob = my_cv.predict_proba(X_test)[:, 1]
@@ -170,7 +172,7 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     plot_roc(fpr, tpr, classifier, logger, myEnv, start_time)
 
     # Printing stuff
-    print_stuff(classifier, my_cv, X_test, y_test, y_pred, y_pred_prob)
+    print_stuff(classifier, my_cv, my_scoring, X_test, y_test, y_pred, y_pred_prob)
 
     # Write same stuff to log
     log_results(logger, my_cv, X_test, y_test, y_pred, y_pred_prob)
