@@ -115,7 +115,7 @@ def main(pdg, classifier):
 if __name__ == '__main__':
     PrintDebuggingInfo = True
     classifiers = ["K-NearestNeighbor", "SupportVectorClassifier"]
-    classifier = classifiers[0]
+    classifier = classifiers[1]
 
     if PrintDebuggingInfo:
         print("Printing debugging information")

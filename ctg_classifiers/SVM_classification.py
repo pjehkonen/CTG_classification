@@ -47,7 +47,7 @@ def plot_matrix(my_cv, X_test, y_test, classifier, my_scoring,  my_env, start_ti
 
     plt.savefig(Path(Path(my_env.log_dir, start_time), 'CF_normalized_'+classifier + ".png"))
 
-def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
+def plot_roc(fpr, tpr, classifier, my_scoring, logger=None, my_env=None, start_time=None):
     if my_env is None:
         logger.info("Displaying figure at IDE")
     else:
@@ -57,8 +57,8 @@ def plot_roc(fpr, tpr, classifier, logger=None, my_env=None, start_time=None):
     plt.legend()
     plt.xlabel("False positive rate")
     plt.ylabel("True Positive Rate")
-    plt.title("{} Regression Curve".format(classifier))
-    plt.savefig(Path(Path(my_env.log_dir, start_time), classifier + ".png"))
+    plt.title("{} AUC ({})".format(classifier, my_scoring))
+    plt.savefig(Path(Path(my_env.log_dir, start_time), 'AUC_'+classifier + ".png"))
 
 
 def print_stuff(classifier, cv, my_scoring, X_test, y_test, y_pred, y_pred_prob):
@@ -160,7 +160,7 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     N_jobs = -1 # use all cores
     nn_jobs = N_jobs
     N_cv = 7  # Number of cross validations in Grid Search
-    my_scoring = 'roc_auc'  # Metric from list of "roc_auc, accuracy, neg_log_loss, jaccard, f1"
+    my_scoring = 'f1'  # Metric from list of "roc_auc, accuracy, neg_log_loss, jaccard, f1"
     my_kernel = 'rbf'
 
     # Make pipeline with steps
@@ -193,7 +193,7 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
 
     logger.info("Generating roc_curve with y_test, y_pred_prob")
     fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
-    plot_roc(fpr, tpr, classifier, logger, myEnv, start_time)
+    plot_roc(fpr, tpr, classifier, my_scoring, logger, myEnv, start_time)
     plot_matrix(my_cv, X_test, y_test, classifier, my_scoring, myEnv, start_time)
 
     # Printing stuff
