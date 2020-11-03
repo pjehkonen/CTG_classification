@@ -3,8 +3,7 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_curve, roc_auc_score, auc
 from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import RandomizedSearchCV
-from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from joblib import dump, load
 from sklearn.metrics import plot_confusion_matrix
@@ -35,7 +34,7 @@ def plot_matrix(my_cv, X_test, y_test, classifier, my_scoring,  my_env, start_ti
                                  normalize=None)
     plt.title(my_title)
 
-    plt.savefig(Path(Path(my_env.log_dir, start_time), 'CF_unnormalized_'+classifier + ".png"))
+    plt.savefig(Path(Path(my_env.log_dir, start_time), 'CFM_unnormalized_'+classifier + ".png"))
     print(my_title)
     print(confusion_matrix)
 
@@ -45,7 +44,7 @@ def plot_matrix(my_cv, X_test, y_test, classifier, my_scoring,  my_env, start_ti
                                  normalize='all')
     plt.title(my_title)
 
-    plt.savefig(Path(Path(my_env.log_dir, start_time), 'CF_normalized_'+classifier + ".png"))
+    plt.savefig(Path(Path(my_env.log_dir, start_time), 'CFM_normalized_'+classifier + ".png"))
 
 def plot_roc(fpr, tpr, classifier, my_scoring, logger=None, my_env=None, start_time=None):
     if my_env is None:
