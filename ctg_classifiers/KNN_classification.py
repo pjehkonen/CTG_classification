@@ -6,6 +6,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from joblib import dump, load
 
 from ctg_lib.ctg_path_env import in_triton
 
@@ -154,6 +155,9 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     # use best parameters    print("Found best parameters")
     # optimal = KNeighborsClassifier(**knn_cv.best_params_, n_jobs=nn_jobs)
     # optimal.fit(X_train, y_train)
+
+    # Save classifier to current log-file location
+    dump(my_cv, Path(myEnv.log_dir, classifier+start_time +'.joblib'))
 
     y_pred = my_cv.predict(X_test)
     y_pred_prob = my_cv.predict_proba(X_test)[:, 1]

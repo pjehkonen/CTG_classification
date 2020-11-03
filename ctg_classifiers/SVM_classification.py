@@ -6,6 +6,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.preprocessing import StandardScaler
+from joblib import dump, load
 
 from ctg_lib.ctg_path_env import in_triton
 
@@ -129,7 +130,7 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     os.environ['OMP_NUM_THREADS'] = num_threads
 
 
-    # Pipeline settings
+    # Pipeline settingsfrom joblib import dump, load
     N_jobs = -1 # use all cores
     nn_jobs = N_jobs
     N_cv = 7  # Number of cross validations in Grid Search
@@ -159,6 +160,7 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     # Actual pipeline fit takes place here
     my_cv.fit(X_train, y_train)
 
+    dump(my_cv, Path(myEnv.log_dir, classifier + start_time + '.joblib'))
 
     y_pred = my_cv.predict(X_test)
     y_pred_prob = my_cv.predict_proba(X_test)[:, 1]
