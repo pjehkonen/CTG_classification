@@ -121,7 +121,7 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     my_scoring = 'roc_auc'  # among options "roc_auc, accuracy, neg_log_loss, jaccard, f1"
 
     # For Triton, break the wall
-    num_threads = '32'
+    num_threads = '16'
     os.environ['OMP_NUM_THREADS'] = num_threads
 
     # For my computer, use all processors
