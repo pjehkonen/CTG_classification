@@ -1,23 +1,19 @@
-import sys, os
+import sys
 import pandas as pd
 import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold, StratifiedShuffleSplit
-from sklearn.model_selection import GroupKFold
+from sklearn.model_selection import train_test_split
 from ctg_classifiers.KNN_classification import CTG_KNN
 from ctg_classifiers.SVM_classification import CTG_SVC
+from ctg_classifiers.RF_classification import CTG_RF
 
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
 from set_env_dirs import in_triton
-from ctg_features.base_features import base_feat
 
 from ctg_lib import import_data
-#from ctg_classifiers.random_train_test_indices import train_test_split
-from ctg_classifiers.make_feature import make_feats
 from ctg_lib.ctg_time import now_time_string
-from ctg_features.spectrum import make_welch_psd
 
 
 def demo_spect():
@@ -77,8 +73,8 @@ def main(pdg, classifier):
 
     logger.info("This is log file for classification algorithm of {}".format(out_dir))
 
-    X, y = base_feat(my_env, logger)
-    #X, y = fast_data(my_env, 1000)
+    #X, y = base_feat(my_env, logger)
+    X, y = fast_data(my_env, 5000)
 
     my_test_size = 0.2
     use_shuffle = True
@@ -96,8 +92,10 @@ def main(pdg, classifier):
 
     if classifier=="K-NearestNeighbor":
         CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, my_env, start_time)
-    elif classifier=="SupportVectorClassifier":
+    elif classifier=="SupportVector":
         CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, my_env, start_time)
+    elif classifier=='RandomForest':
+        CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, my_env, start_time)
 
     ''''
     N_FOLDS = 5
@@ -114,8 +112,8 @@ def main(pdg, classifier):
 
 if __name__ == '__main__':
     PrintDebuggingInfo = True
-    classifiers = ["K-NearestNeighbor", "SupportVectorClassifier"]
-    classifier = classifiers[1]
+    classifiers = ["K-NearestNeighbor", "SupportVector", "RandomForest"]
+    classifier = classifiers[2]
 
     if PrintDebuggingInfo:
         print("Printing debugging information")
