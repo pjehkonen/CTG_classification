@@ -46,17 +46,22 @@ def plot_matrix(my_cv, X_test, y_test, classifier, my_scoring,  my_env, start_ti
 
     plt.savefig(Path(Path(my_env.log_dir, start_time), 'CFM_normalized_'+classifier + ".png"))
 
-def plot_roc(fpr, tpr, classifier, my_scoring, logger=None, my_env=None, start_time=None):
+def plot_roc(fpr, tpr, classifier, my_scoring, training, logger=None, my_env=None, start_time=None):
     if my_env is None:
         logger.info("Displaying figure at IDE")
     else:
         logger.info("Generating a figure at {} for {}".format(start_time, classifier))
+    fig = plt.figure(figsize=(10,10), dpi=100)
     plt.plot([0, 1], [0, 1], 'k--')
-    plt.plot(fpr, tpr, label="AUC {}".format(auc(fpr, tpr)))
+    plt.plot(fpr, tpr, label="AUC {:.4f}".format(auc(fpr, tpr)))
     plt.legend()
     plt.xlabel("False positive rate")
     plt.ylabel("True Positive Rate")
-    plt.title("{} AUC ({})".format(classifier, my_scoring))
+    if training:
+        tset = 'training'
+    else:
+        tset = 'test'
+    plt.title("{} AUC with {} ({})".format(classifier, tset, my_scoring))
     plt.savefig(Path(Path(my_env.log_dir, start_time), 'AUC_'+classifier + ".png"))
 
 
@@ -146,7 +151,8 @@ def CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_ti
     # Setting Random Forest parameters for both hyperparameter search and criteria
     my_n_estimators = 100
     my_criterion = 'gini' # 'gini' or 'entropy'
-    my_max_depth = 2
+    my_criterions = ['gini','entropy']
+    my_max_depth = 10
     my_min_samples_split = int(y_test.sum()/3) # make so that max third of test zigzags are minimum split
     my_min_samples_leaf = 1
     my_boostrap = True
@@ -161,7 +167,7 @@ def CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_ti
 
     # Pipeline settingsfrom joblib import dump, load
     my_cv = 7  # Number of cross validations in Grid Search
-    my_scoring = 'roc_auc'  # Metric from list of "roc_auc, accuracy, neg_log_loss, jaccard, f1"
+    my_scoring = 'f1'  # Metric from list of "roc_auc, accuracy, neg_log_loss, jaccard, f1"
 
 
     # Make pipeline with steps
@@ -170,8 +176,8 @@ def CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_ti
     pipeline = Pipeline(steps)
 
     # Define SVC_related grid search parameters
-    parameters = {'RFC__max_depth': my_max_depth,
-                  'RFC__criterion': my_criterion
+    parameters = {'RFC__max_depth': np.arange(1, my_max_depth),
+                  'RFC__criterion': my_criterions
                   }
 
     print("Parameters set for environment and classifier")
@@ -194,7 +200,7 @@ def CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_ti
 
     logger.info("Generating roc_curve with y_test, y_pred_prob")
     fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
-    plot_roc(fpr, tpr, classifier, my_scoring, logger, myEnv, start_time)
+    plot_roc(fpr, tpr, classifier, my_scoring, training=False, logger=None, my_env=None, start_time=None)
     plot_matrix(my_cv, X_test, y_test, classifier, my_scoring, myEnv, start_time)
 
     # Printing stuff

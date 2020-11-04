@@ -39,6 +39,7 @@ def plot_matrix(my_cv, X_test, y_test, classifier, my_scoring,  my_env, start_ti
     print(my_title)
     print(confusion_matrix)
 
+    fig = plt.figure(figsize=(8, 8), dpi=150)
     plot_confusion_matrix(my_cv, X_test, y_test,
                                  display_labels=class_names,
                                  cmap=plt.cm.Blues,

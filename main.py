@@ -7,10 +7,12 @@ from sklearn.model_selection import train_test_split
 from ctg_classifiers.KNN_classification import CTG_KNN
 from ctg_classifiers.SVM_classification import CTG_SVC
 from ctg_classifiers.RF_classification import CTG_RF
+from ctg_features.base_features import base_feat
 
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
 from set_env_dirs import in_triton
+from ctg_lib.ca import ca_one
 
 from ctg_lib import import_data
 from ctg_lib.ctg_time import now_time_string
@@ -24,24 +26,6 @@ def demo_spect():
     return
 
 
-def fast_data(my_env, dset_size):
-
-    # This is to sample very short subset of data for testing classifier.
-    normal_df, salt_df = import_data.import_data(False, my_env)
-
-    num_norm = dset_size
-    num_salt = int(dset_size/100)
-
-    norm_sub = normal_df.T.sample(num_norm)
-    salt_sub = salt_df.T.sample(num_salt)
-
-    X = pd.concat([norm_sub, salt_sub], ignore_index=True, axis=0)
-    y = np.zeros(num_norm+num_salt, dtype=int)
-    y[num_norm:] = 1
-
-    return X, y
-
-
 def logging_data(logger, X, X_train, X_test, y, y_train, y_test, my_env, start_time):
     logger.info("X shape is    {}".format(X.shape))
     logger.info("X_train shape {}".format(X_train.shape))
@@ -52,13 +36,14 @@ def logging_data(logger, X, X_train, X_test, y, y_train, y_test, my_env, start_t
     logger.info("Number of ZigZags in training set {}".format(np.sum(y_train)))
     logger.info("Number of ZigZags in test set     {}".format(np.sum(y_test)))
 
-    np.savetxt(Path(my_env.log_dir,start_time+"/test_group.csv"),X_test.index.values, fmt="%d")
-    np.savetxt(Path(my_env.log_dir,start_time+"/train_group.csv"),X_train.index.values, fmt="%d")
+    np.savetxt(Path(my_env.log_dir, start_time + "/test_group.csv"), X_test.index.values, fmt="%d")
+    np.savetxt(Path(my_env.log_dir, start_time + "/train_group.csv"), X_train.index.values, fmt="%d")
 
     logger.info("Test and Training indices written to log with this time_now as identifier")
 
-def main(pdg, classifier):
 
+def main(pdg, classifier, start_time):
+    full_data = False
     plt.style.use('ggplot')
 
     if in_triton.in_triton():
@@ -66,15 +51,17 @@ def main(pdg, classifier):
         print("lib appended to Triton path")
 
     out_dir = classifier
-    start_time = now_time_string()
 
     operating_in_triton, my_env = setup_env.setup_env(pdg, output_dir=out_dir, log_start=start_time)
     logger = setup_log.setup_log(pdg, my_env, start_time)
 
     logger.info("This is log file for classification algorithm of {}".format(out_dir))
 
-    #X, y = base_feat(my_env, logger)
-    X, y = fast_data(my_env, 5000)
+    if full_data:
+        X, y = base_feat(my_env, logger)
+    else:
+        X, y = base_feat(my_env, logger, 1000)
+
 
     my_test_size = 0.2
     use_shuffle = True
@@ -90,11 +77,11 @@ def main(pdg, classifier):
     # set up parameters for knn
     logger.info("Calling ctg classifier {}".format(classifier))
 
-    if classifier=="K-NearestNeighbor":
+    if classifier == "K-NearestNeighbor":
         CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, my_env, start_time)
-    elif classifier=="SupportVector":
+    elif classifier == "SupportVector":
         CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, my_env, start_time)
-    elif classifier=='RandomForest':
+    elif classifier == 'RandomForest':
         CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, my_env, start_time)
 
     ''''
@@ -111,11 +98,14 @@ def main(pdg, classifier):
 
 
 if __name__ == '__main__':
+    start_time = now_time_string()
     PrintDebuggingInfo = True
     classifiers = ["K-NearestNeighbor", "SupportVector", "RandomForest"]
-    classifier = classifiers[2]
+    classifier = classifiers[1]
 
     if PrintDebuggingInfo:
         print("Printing debugging information")
 
-    main(PrintDebuggingInfo, classifier)
+    main(PrintDebuggingInfo, classifier, start_time)
+
+    ca_one(classifier, start_time)

@@ -12,13 +12,13 @@ def log_features(X, logger, feature_func):
     logger.info("\n{}".format(X.describe()))
 
 
-
 def make_y_df(n_size, s_size):
-    y_array = np.zeros(n_size+s_size, dtype=int)
+    y_array = np.zeros(n_size + s_size, dtype=int)
     y_array[-s_size:] = 1
     return y_array
 
-def base_feat(my_env, logger):
+
+def base_feat(my_env, logger, dsetsize=None):
     normal_df, salt_df = import_data.import_data(False, my_env)
     X_in = pd.concat([normal_df, salt_df], ignore_index=True, axis=1)
     y = make_y_df(normal_df.shape[1], salt_df.shape[1])
@@ -30,6 +30,11 @@ def base_feat(my_env, logger):
     X['cumsum'] = X_in.cumsum(axis=0).iloc[-1].values
 
     log_features(X, logger, "base_feat")
+
+    if dsetsize is not None:
+        X = X.sample(dsetsize)
+        y = y[X.index.values]
+
     return X, y
 
 

@@ -12,6 +12,7 @@ from sklearn.metrics import plot_confusion_matrix
 from ctg_lib.ctg_path_env import in_triton
 
 import matplotlib
+
 if in_triton():
     matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -23,42 +24,45 @@ from pathlib import Path
 import os
 
 
-def plot_matrix(my_cv, X_test, y_test, classifier, my_scoring,  my_env, start_time):
+def plot_matrix(my_cv, X_test, y_test, classifier, my_scoring, my_env, start_time):
     plt.style.use('default')
-    fig = plt.figure(figsize=(8,8), dpi=150)
+    fig = plt.figure(figsize=(8, 8), dpi=150)
 
     my_title = "{} Confusion Matrix ({})".format(classifier, my_scoring)
-    class_names = ['normal','zigzag']
+    class_names = ['normal', 'zigzag']
     plot_confusion_matrix(my_cv, X_test, y_test,
-                                 display_labels=class_names,
-                                 cmap=plt.cm.Blues,
-                                 normalize=None)
+                          display_labels=class_names,
+                          cmap=plt.cm.Blues,
+                          normalize=None)
     plt.title(my_title)
 
-    plt.savefig(Path(Path(my_env.log_dir, start_time), 'CF_unnormalized_'+classifier + ".png"))
+    plt.savefig(Path(Path(my_env.log_dir, start_time), 'CF_unnormalized_' + classifier + ".png"))
     print(my_title)
     print(confusion_matrix)
 
+    fig = plt.figure(figsize=(8, 8), dpi=150)
     plot_confusion_matrix(my_cv, X_test, y_test,
-                                 display_labels=class_names,
-                                 cmap=plt.cm.Blues,
-                                 normalize='all')
+                          display_labels=class_names,
+                          cmap=plt.cm.Blues,
+                          normalize='all')
     plt.title(my_title)
 
-    plt.savefig(Path(Path(my_env.log_dir, start_time), 'CF_normalized_'+classifier + ".png"))
+    plt.savefig(Path(Path(my_env.log_dir, start_time), 'CF_normalized_' + classifier + ".png"))
+
 
 def plot_roc(fpr, tpr, classifier, my_scoring, logger=None, my_env=None, start_time=None):
     if my_env is None:
         logger.info("Displaying figure at IDE")
     else:
         logger.info("Generating a figure at {} for {}".format(start_time, classifier))
+    fig = plt.figure(figsize=(10, 10), dpi=100)
     plt.plot([0, 1], [0, 1], 'k--')
-    plt.plot(fpr, tpr, label="AUC {}".format(auc(fpr, tpr)))
+    plt.plot(fpr, tpr, label="AUC {:.4f}".format(auc(fpr, tpr)))
     plt.legend()
     plt.xlabel("False positive rate")
     plt.ylabel("True Positive Rate")
     plt.title("{} AUC ({})".format(classifier, my_scoring))
-    plt.savefig(Path(Path(my_env.log_dir, start_time), 'AUC_'+classifier + ".png"))
+    plt.savefig(Path(Path(my_env.log_dir, start_time), 'AUC_' + classifier + ".png"))
 
 
 def print_stuff(classifier, cv, my_scoring, X_test, y_test, y_pred, y_pred_prob):
@@ -140,11 +144,9 @@ def make_grid_cv_svc(pipeline, parameters, my_scoring, nn_jobs, N_cv, logger):
 
 
 def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_time):
-
-
     # Setting SVC parameters for both hyperparameter search and criteria
     C = 1
-    my_C_params = np.linspace(0.75, C,4)
+    my_C_params = np.linspace(0.75, C, 4)
     kernels = ["linear", "poly", "rbf", "sigmoid"]
     my_degrees = [3, 4, 5]
     my_cache_size = 2000
@@ -155,9 +157,8 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     num_threads = '32'
     os.environ['OMP_NUM_THREADS'] = num_threads
 
-
     # Pipeline settingsfrom joblib import dump, load
-    N_jobs = -1 # use all cores
+    N_jobs = -1  # use all cores
     nn_jobs = N_jobs
     N_cv = 7  # Number of cross validations in Grid Search
     my_scoring = 'f1'  # Metric from list of "roc_auc, accuracy, neg_log_loss, jaccard, f1"
@@ -165,7 +166,8 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
 
     # Make pipeline with steps
     steps = [('scaler', StandardScaler()),
-             ('svc', SVC(kernel=my_kernel, probability=True, cache_size=my_cache_size, max_iter=my_max_iter, class_weight='balanced'))]
+             ('svc', SVC(kernel=my_kernel, probability=True, cache_size=my_cache_size, max_iter=my_max_iter,
+                         class_weight='balanced'))]
     pipeline = Pipeline(steps)
 
     # Define SVC_related grid search parameters
@@ -182,11 +184,11 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     logger.info("Starting classifier search fit")
     print("Starting Cross Validation")
 
-    #my_cv = make_pipeline(StandardScaler(), SVC(probability=True))
+    # my_cv = make_pipeline(StandardScaler(), SVC(probability=True))
     # Actual pipeline fit takes place here
     my_cv.fit(X_train, y_train)
 
-    dump(my_cv, Path(myEnv.log_dir, classifier+'_'+start_time +'.joblib'))
+    dump(my_cv, Path(myEnv.log_dir, classifier + '_' + start_time + '.joblib'))
 
     y_pred = my_cv.predict(X_test)
     y_pred_prob = my_cv.predict_proba(X_test)[:, 1]
