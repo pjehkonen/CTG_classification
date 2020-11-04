@@ -22,6 +22,28 @@ import matplotlib.pyplot as plt
 
 from joblib import dump, load
 
+def plot_matrix(model, X_test, y_test):
+    plt.style.use('default')
+    fig = plt.figure(figsize=(8,8), dpi=150)
+
+    my_title = "{} Confusion Matrix ({})".format(model.estimator.steps[1][0], model.scoring)
+    class_names = ['normal','zigzag']
+    plot_confusion_matrix(model, X_test, y_test,
+                                 display_labels=class_names,
+                                 cmap=plt.cm.Blues,
+                                 normalize=None)
+    plt.title(my_title)
+
+    plt.show()
+
+    plt.figure(figsize=(8, 8), dpi=150)
+    plot_confusion_matrix(model, X_test, y_test,
+                                 display_labels=class_names,
+                                 cmap=plt.cm.Blues,
+                                 normalize='all')
+    plt.title(my_title)
+    plt.show()
+
 
 def plot_roc(model, ground_truth, estimate, message):
     fpr, tpr, thresholds = roc_curve(ground_truth, estimate)
@@ -35,16 +57,11 @@ def plot_roc(model, ground_truth, estimate, message):
     plt.show()
 
 
-def ca_one(classifier, start_time):
+def ca_one(classifier, start_time, my_env, logger):
     tt_path = Path('/media/jehkonp1/SecureLacie/DATA2h/Scratch/' + classifier + '/log/' + start_time)
     trained_classifier = Path(tt_path.parent, tt_path.parent.parent.name + '_' + tt_path.name + '.joblib')
 
     model = load(trained_classifier)
-    pdg = True
-    out_dir = classifier
-    start_time = '0101dummy'
-    operating_in_triton, my_env = setup_env.setup_env(pdg, output_dir=out_dir, log_start=start_time)
-    logger = setup_log.setup_log(pdg, my_env, start_time)
 
     X, y = base_feat(my_env, logger)
 
@@ -68,3 +85,4 @@ def ca_one(classifier, start_time):
     plot_roc(model, y_test, y_test_pred_prob, "y test prob")
     plot_roc(model, y_train, y_train_pred, "y train")
     plot_roc(model, y_train, y_train_pred_prob, "y tarin prob")
+    plot_matrix(model, X_test, y_test)

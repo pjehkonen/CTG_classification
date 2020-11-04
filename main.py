@@ -42,18 +42,9 @@ def logging_data(logger, X, X_train, X_test, y, y_train, y_test, my_env, start_t
     logger.info("Test and Training indices written to log with this time_now as identifier")
 
 
-def main(pdg, classifier, start_time):
-    full_data = False
+def main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
+    full_data = True
     plt.style.use('ggplot')
-
-    if in_triton.in_triton():
-        sys.path.append('/scratch/cs/salka/PJ_SALKA/CTG_classification/ctg_lib')
-        print("lib appended to Triton path")
-
-    out_dir = classifier
-
-    operating_in_triton, my_env = setup_env.setup_env(pdg, output_dir=out_dir, log_start=start_time)
-    logger = setup_log.setup_log(pdg, my_env, start_time)
 
     logger.info("This is log file for classification algorithm of {}".format(out_dir))
 
@@ -106,6 +97,15 @@ if __name__ == '__main__':
     if PrintDebuggingInfo:
         print("Printing debugging information")
 
-    main(PrintDebuggingInfo, classifier, start_time)
+    if in_triton.in_triton():
+        sys.path.append('/scratch/cs/salka/PJ_SALKA/CTG_classification/ctg_lib')
+        print("lib appended to Triton path")
 
-    ca_one(classifier, start_time)
+    out_dir = classifier
+
+    operating_in_triton, my_env = setup_env.setup_env(PrintDebuggingInfo, output_dir=out_dir, log_start=start_time)
+    logger = setup_log.setup_log(PrintDebuggingInfo, my_env, start_time)
+
+    main(PrintDebuggingInfo, classifier, start_time, logger, operating_in_triton, my_env)
+
+    #ca_one(classifier, start_time, my_env, logger)

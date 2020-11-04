@@ -199,7 +199,7 @@ def CTG_KNN(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     logger.info("Generating roc_curve with y_test, y_pred_prob")
     fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
     plot_roc(fpr, tpr, classifier, my_scoring, logger, myEnv, start_time)
-    plot_matrix(my_cv, X_test, y_test, classifier, my_scoring, myEnv, start_time)
+    #plot_matrix(my_cv, X_test, y_test, classifier, my_scoring, myEnv, start_time)
 
     # Printing stuff
     print_stuff(classifier, my_cv, my_scoring, X_test, y_test, y_pred, y_pred_prob)
