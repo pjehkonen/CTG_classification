@@ -161,7 +161,7 @@ def CTG_SVC(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_t
     N_jobs = -1  # use all cores
     nn_jobs = N_jobs
     N_cv = 7  # Number of cross validations in Grid Search
-    my_scoring = 'roc_auc'  # Metric from list of "roc_auc, accuracy, neg_log_loss, jaccard, f1"
+    my_scoring = 'f1'  # Metric from list of "roc_auc, accuracy, neg_log_loss, jaccard, f1"
     my_kernel = 'rbf'
 
     # Make pipeline with steps
