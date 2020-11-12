@@ -174,7 +174,6 @@ def CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_ti
     # Make pipeline with steps
     steps = [('scaler', StandardScaler()),
              ('RFC', RandomForestClassifier(n_estimators=my_n_estimators,
-                                            max_depth=my_max_depth,
                                             min_samples_split=my_min_samples_split,
                                             max_features="auto",
                                             min_samples_leaf=my_min_samples_leaf,

@@ -51,7 +51,7 @@ def main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
     if full_data:
         X, y = base_feat(my_env, logger)
     else:
-        X, y = base_feat(my_env, logger, 1000)
+        X, y = base_feat(my_env, logger, 10000)
 
 
     my_test_size = 0.2
