@@ -173,7 +173,16 @@ def CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_ti
 
     # Make pipeline with steps
     steps = [('scaler', StandardScaler()),
-             ('RFC', RandomForestClassifier())]
+             ('RFC', RandomForestClassifier(n_estimators=my_n_estimators,
+                                            max_depth=my_max_depth,
+                                            min_samples_split=my_min_samples_split,
+                                            max_features="auto",
+                                            min_samples_leaf=my_min_samples_leaf,
+                                            bootstrap=my_boostrap,
+                                            n_jobs=my_n_jobs,
+                                            verbose=2,
+                                            class_weight=my_class_weight,
+                                            max_samples=my_max_samples))]
     pipeline = Pipeline(steps)
 
     # Define SVC_related grid search parameters
