@@ -153,7 +153,7 @@ def CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_ti
     my_criterion = 'gini' # 'gini' or 'entropy'
     my_criterions = ['gini','entropy']
     my_max_depth = 10
-    my_min_samples_split = int(y_test.sum()/3) # make so that max third of test zigzags are minimum split
+    my_min_samples_split = int(y_test.sum()/3)+1 # make so that max third of test zigzags are minimum split
     my_min_samples_leaf = 1
     my_boostrap = True
     my_n_jobs = -1
