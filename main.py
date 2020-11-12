@@ -43,7 +43,12 @@ def logging_data(logger, X, X_train, X_test, y, y_train, y_test, my_env, start_t
 
 
 def main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
-    full_data = False
+
+    if operating_in_triton:
+        full_data = True
+    else:
+        full_data = False
+
     plt.style.use('ggplot')
 
     logger.info("This is log file for classification algorithm of {}".format(out_dir))

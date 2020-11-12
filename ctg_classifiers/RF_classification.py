@@ -149,10 +149,11 @@ def make_grid_cv_svc(pipeline, parameters, my_scoring, nn_jobs, N_cv, logger):
 def CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_time):
 
     # Setting Random Forest parameters for both hyperparameter search and criteria
-    my_n_estimators = 1000
+    my_n_estimators = [64, 128, 256, 512, 1024, 2048]
     my_criterion = 'gini' # 'gini' or 'entropy'
     my_criterions = ['gini','entropy']
-    my_max_depth = 100
+    my_min_depth = 5
+    my_max_depth = 50
     my_min_samples_split = np.max([int(y_test.sum()/3),2]) # make so that max third of test zigzags are minimum split
     my_min_samples_leaf = 1
     my_boostrap = True
@@ -173,19 +174,19 @@ def CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_ti
 
     # Make pipeline with steps
     steps = [('scaler', StandardScaler()),
-             ('RFC', RandomForestClassifier(n_estimators=my_n_estimators,
-                                            min_samples_split=my_min_samples_split,
+             ('RFC', RandomForestClassifier(min_samples_split=my_min_samples_split,
                                             max_features="auto",
                                             min_samples_leaf=my_min_samples_leaf,
                                             bootstrap=my_boostrap,
                                             n_jobs=my_n_jobs,
-                                            verbose=2,
+                                            verbose=1,
                                             class_weight=my_class_weight,
                                             max_samples=my_max_samples))]
     pipeline = Pipeline(steps)
 
     # Define SVC_related grid search parameters
-    parameters = {'RFC__max_depth': np.arange(1, my_max_depth),
+    parameters = {'RFC__n_estimators':my_n_estimators,
+                  'RFC__max_depth': np.arange(my_min_depth, my_max_depth, 5),
                   'RFC__criterion': my_criterions
                   }
 
