@@ -169,6 +169,7 @@ def CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_ti
     my_cv = 7  # Number of cross validations in Grid Search
     my_scoring = 'f1'  # Metric from list of "roc_auc, accuracy, neg_log_loss, jaccard, f1"
 
+    training_set = True
 
     # Make pipeline with steps
     steps = [('scaler', StandardScaler()),
@@ -200,7 +201,7 @@ def CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_ti
 
     logger.info("Generating roc_curve with y_test, y_pred_prob")
     fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
-    plot_roc(fpr, tpr, classifier, my_scoring, logger, myEnv, start_time)
+    plot_roc(fpr, tpr, classifier, my_scoring, training_set, logger, myEnv, start_time)
     plot_matrix(my_cv, X_test, y_test, classifier, my_scoring, myEnv, start_time)
 
     # Printing stuff
