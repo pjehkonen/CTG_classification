@@ -200,7 +200,7 @@ def CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_ti
 
     logger.info("Generating roc_curve with y_test, y_pred_prob")
     fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
-    plot_roc(fpr, tpr, classifier, my_scoring, training=False, logger=None, my_env=None, start_time=None)
+    plot_roc(fpr, tpr, classifier, my_scoring, logger, myEnv, start_time)
     plot_matrix(my_cv, X_test, y_test, classifier, my_scoring, myEnv, start_time)
 
     # Printing stuff
