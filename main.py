@@ -41,8 +41,10 @@ def logging_data(logger, X, X_train, X_test, y, y_train, y_test, my_env, start_t
 
     logger.info("Test and Training indices written to log with this time_now as identifier")
 
+def a_main(PrintDebuggingInfo, classifier, start_time, logger, operating_in_triton, my_env):
+    ca_one(classifier, start_time, my_env, logger, operating_in_triton)
 
-def main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
+def c_main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
 
     if operating_in_triton:
         full_data = True
@@ -94,10 +96,13 @@ def main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
 
 
 if __name__ == '__main__':
-    start_time = now_time_string()
-    PrintDebuggingInfo = True
+    TASKS = ['classify','analyze']
+    TASK = TASKS[1]
     classifiers = ["K-NearestNeighbor", "SupportVector", "RandomForest"]
     classifier = classifiers[2]
+
+    start_time = now_time_string()
+    PrintDebuggingInfo = True
 
     if PrintDebuggingInfo:
         print("Printing debugging information")
@@ -106,11 +111,26 @@ if __name__ == '__main__':
         sys.path.append('/scratch/cs/salka/PJ_SALKA/CTG_classification/ctg_lib')
         print("lib appended to Triton path")
 
-    out_dir = classifier
+    if TASK == 'classify':
+        out_dir = classifier
+
+    elif TASK == 'analyze':
+        out_dir = 'Analysis_of_'+classifier
+
+    else:
+        print("unknown task, exiting")
+        sys.exit()
 
     operating_in_triton, my_env = setup_env.setup_env(PrintDebuggingInfo, output_dir=out_dir, log_start=start_time)
     logger = setup_log.setup_log(PrintDebuggingInfo, my_env, start_time)
 
-    main(PrintDebuggingInfo, classifier, start_time, logger, operating_in_triton, my_env)
+
+    if TASK == 'classify':
+        c_main(PrintDebuggingInfo, classifier, start_time, logger, operating_in_triton, my_env)
+    elif TASK == 'analyze':
+        a_main(PrintDebuggingInfo, classifier, start_time, logger, True, my_env)
+    else:
+        print("error on selecting main, exiting")
+        sys.exit()
 
     #ca_one(classifier, start_time, my_env, logger)

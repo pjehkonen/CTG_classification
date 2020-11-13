@@ -57,8 +57,12 @@ def plot_roc(model, ground_truth, estimate, message):
     plt.show()
 
 
-def ca_one(classifier, start_time, my_env, logger):
-    tt_path = Path('/media/jehkonp1/SecureLacie/DATA2h/Scratch/' + classifier + '/log/' + start_time)
+def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
+    orig_time = '2020-11-12_20-20-28'
+    if operating_in_triton:
+        tt_path = Path('/run/user/1000/gvfs/smb-share:server=data.triton.aalto.fi,share=scratch/cs/salka/Results/'+classifier+'/log/'+orig_time)
+    else:
+        tt_path = Path('/media/jehkonp1/SecureLacie/DATA2h/Scratch/' + classifier + '/log/' + orig_time)
     trained_classifier = Path(tt_path.parent, tt_path.parent.parent.name + '_' + tt_path.name + '.joblib')
 
     model = load(trained_classifier)
