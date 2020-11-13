@@ -45,7 +45,7 @@ def plot_matrix(model, X_test, y_test):
     plt.show()
 
 
-def plot_roc(model, ground_truth, estimate, message):
+def plot_roc(pipe_model, ground_truth, estimate, message):
     fpr, tpr, thresholds = roc_curve(ground_truth, estimate)
     plt.figure(figsize=(10, 10), dpi=100)
     plt.plot([0, 1], [0, 1], 'k--')
@@ -53,7 +53,8 @@ def plot_roc(model, ground_truth, estimate, message):
     plt.legend()
     plt.xlabel("False positive rate")
     plt.ylabel("True Positive Rate")
-    plt.title("{} AUC ({}) {}".format(model.estimator.steps[1][0], model.scoring, message))
+    #plt.title("{} AUC ({}) {}".format(pipe_model.estimator.steps[1][0], pipe_model.scoring, message))
+    plt.title("AUC")
     plt.show()
 
 
@@ -79,14 +80,17 @@ def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
     y_train = y[train_i]
     y_test = y[test_i]
 
-    y_train_pred = model.predict(X_train)
-    y_test_pred = model.predict(X_test)
+    best_model = model.best_estimator_[1]
+    best_model.fit(X_train, y_train)
 
-    y_train_pred_prob = model.predict_proba(X_train)[:, 1]
-    y_test_pred_prob = model.predict_proba(X_test)[:, 1]
+    y_train_pred = best_model.predict(X_train)
+    y_test_pred = best_model.predict(X_test)
 
-    plot_roc(model, y_test, y_test_pred, "y test")
+    y_train_pred_prob = best_model.predict_proba(X_train)[:, 1]
+    y_test_pred_prob = best_model.predict_proba(X_test)[:, 1]
+
+    #plot_roc(model, y_test, y_test_pred, "y test")
     plot_roc(model, y_test, y_test_pred_prob, "y test prob")
-    plot_roc(model, y_train, y_train_pred, "y train")
-    plot_roc(model, y_train, y_train_pred_prob, "y tarin prob")
+    #plot_roc(model, y_train, y_train_pred, "y train")
+    plot_roc(model, y_train, y_train_pred_prob, "y train prob")
     plot_matrix(model, X_test, y_test)
