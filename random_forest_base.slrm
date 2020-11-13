@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name=RF_SVM
 #SBATCH -c 32
-#SBATCH -t 24:00:00
-#SBATCH --mem=73000
-#SBATCH --output=/scratch/cs/salka/scratch/svm.%j.out
+#SBATCH -t 3:00:00
+#SBATCH --mem=32000
+#SBATCH --output=/scratch/cs/salka/scratch/rf.%j.out
 
 export NUMEXPR_MAX_THREADS=32
 
