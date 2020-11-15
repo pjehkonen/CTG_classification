@@ -51,12 +51,12 @@ def plot_roc(pipe_model, ground_truth, estimate, message):
     fpr, tpr, thresholds = roc_curve(ground_truth, estimate)
     plt.figure(figsize=(10, 10), dpi=100)
     plt.plot([0, 1], [0, 1], 'k--')
-    plt.plot(fpr, tpr, label="{} AUC {:.4f}".format(message, auc(fpr, tpr)))
+    plt.plot(fpr, tpr, label="AUC {:.4f}".format(auc(fpr, tpr)))
     plt.legend()
     plt.xlabel("False positive rate")
     plt.ylabel("True Positive Rate")
     #plt.title("{} AUC ({}) {}".format(pipe_model.estimator.steps[1][0], pipe_model.scoring, message))
-    plt.title("AUC")
+    plt.title("{} AUC".format(message))
     plt.show()
 
 
@@ -94,8 +94,8 @@ def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
     y_train_pred_prob = best_model.predict_proba(X_train_scaled)[:, 1]
     y_test_pred_prob = best_model.predict_proba(X_test_scaled)[:, 1]
 
-    plot_roc(model, y_train, y_train_pred_prob, "y train prob")
-    plot_roc(model, y_test, y_test_pred_prob, "y test prob")
+    plot_roc(model, y_train, y_train_pred_prob, "Training")
+    plot_roc(model, y_test, y_test_pred_prob, "Testing")
 
     plot_matrix(model, X_train, y_train)
     plot_matrix(model, X_test, y_test)

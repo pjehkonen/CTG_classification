@@ -149,17 +149,17 @@ def make_grid_cv_svc(pipeline, parameters, my_scoring, nn_jobs, N_cv, logger):
 def CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_time):
 
     # Setting Random Forest parameters for both hyperparameter search and criteria
-    my_n_estimators = [64, 128, 256, 512, 1024, 2048]
+    my_n_estimators = [100, 125, 150, 175, 200, 225]
     my_criterion = 'gini' # 'gini' or 'entropy'
     my_criterions = ['gini','entropy']
-    my_min_depth = 5
-    my_max_depth = 50
+    my_min_depth = 4
+    my_max_depth = 20
     my_min_samples_split = np.max([int(y_test.sum()/3),2]) # make so that max third of test zigzags are minimum split
     my_min_samples_leaf = 1
     my_boostrap = True
     my_n_jobs = -1
     my_class_weight = 'balanced_subsample'
-    my_max_samples = None
+    my_max_samples = 0.5
 
     # For Triton, break the wall
     num_threads = '32'
