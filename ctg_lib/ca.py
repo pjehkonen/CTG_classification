@@ -82,11 +82,11 @@ def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
     scaler = StandardScaler()
 
     X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
 
 
     best_model = model.best_estimator_[1]
-    best_model.fit(X_train_scaled, y_train)
+    #best_model.fit(X_train_scaled, y_train)
 
     y_train_pred = best_model.predict(X_train_scaled)
     y_test_pred = best_model.predict(X_test_scaled)
@@ -110,6 +110,6 @@ def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
     print("Classification report training")
     print(classification_report(y_train, y_train_pred))
     print("Classification report testing")
-    print(classification_report(y_train, y_train_pred))
+    print(classification_report(y_test, y_test_pred))
 
     print("huihai")
