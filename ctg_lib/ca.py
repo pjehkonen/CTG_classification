@@ -13,6 +13,7 @@ from sklearn.metrics import roc_curve, roc_auc_score, auc
 from sklearn.metrics import plot_confusion_matrix
 from ctg_lib.ctg_path_env import in_triton
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import classification_report
 
 import matplotlib
 
@@ -35,6 +36,7 @@ def plot_matrix(model, X_test, y_test):
     plt.title(my_title)
 
     plt.show()
+    fig = plt.figure(figsize=(8, 8), dpi=150)
 
     plt.figure(figsize=(8, 8), dpi=150)
     plot_confusion_matrix(model, X_test, y_test,
@@ -49,7 +51,7 @@ def plot_roc(pipe_model, ground_truth, estimate, message):
     fpr, tpr, thresholds = roc_curve(ground_truth, estimate)
     plt.figure(figsize=(10, 10), dpi=100)
     plt.plot([0, 1], [0, 1], 'k--')
-    plt.plot(fpr, tpr, label="AUC {:.4f}".format(auc(fpr, tpr)))
+    plt.plot(fpr, tpr, label="{} AUC {:.4f}".format(message, auc(fpr, tpr)))
     plt.legend()
     plt.xlabel("False positive rate")
     plt.ylabel("True Positive Rate")
@@ -79,18 +81,35 @@ def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
 
     scaler = StandardScaler()
 
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_train)
+
+
     best_model = model.best_estimator_[1]
-    best_model.fit(scaler.fit_transform(X_train), y_train)
+    best_model.fit(X_train_scaled, y_train)
 
-    y_train_pred = best_model.predict(scaler.fit_transform(X_train))
-    y_test_pred = best_model.predict(scaler.transform(X_test))
+    y_train_pred = best_model.predict(X_train_scaled)
+    y_test_pred = best_model.predict(X_test_scaled)
 
-    y_train_pred_prob = best_model.predict_proba(scaler.transform(X_train))[:, 1]
-    y_test_pred_prob = best_model.predict_proba(scaler.transform(X_test))[:, 1]
+    y_train_pred_prob = best_model.predict_proba(X_train_scaled)[:, 1]
+    y_test_pred_prob = best_model.predict_proba(X_test_scaled)[:, 1]
 
-    #plot_roc(model, y_test, y_test_pred, "y test")
-    plot_roc(model, y_test, y_test_pred_prob, "y test prob")
-    #plot_roc(model, y_train, y_train_pred, "y train")
     plot_roc(model, y_train, y_train_pred_prob, "y train prob")
+    plot_roc(model, y_test, y_test_pred_prob, "y test prob")
+
+    plot_matrix(model, X_train, y_train)
     plot_matrix(model, X_test, y_test)
+
+    # printing stuff
+    print("Training Accuracy is ", best_model.score(X_train_scaled, y_train))
+    print("Test Accuracy is ", best_model.score(X_test_scaled, y_test))
+    print("Training Confusion matrix")
+    print(confusion_matrix(y_train, y_train_pred))
+    print("Test confusion matrix")
+    print(confusion_matrix(y_test, y_test_pred))
+    print("Classification report training")
+    print(classification_report(y_train, y_train_pred))
+    print("Classification report testing")
+    print(classification_report(y_train, y_train_pred))
+
     print("huihai")
