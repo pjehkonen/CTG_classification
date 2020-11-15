@@ -97,7 +97,7 @@ def c_main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
 
 if __name__ == '__main__':
     TASKS = ['classify','analyze']
-    TASK = TASKS[0]
+    TASK = TASKS[1]
     classifiers = ["K-NearestNeighbor", "SupportVector", "RandomForest"]
     classifier = classifiers[2]
 

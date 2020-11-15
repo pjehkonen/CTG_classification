@@ -61,7 +61,8 @@ def plot_roc(pipe_model, ground_truth, estimate, message):
 
 
 def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
-    orig_time = '2020-11-12_20-20-28'
+    #orig_time = '2020-11-12_20-20-28'
+    orig_time = '2020-11-15_19-15-20'
     if operating_in_triton:
         tt_path = Path('/run/user/1000/gvfs/smb-share:server=data.triton.aalto.fi,share=scratch/cs/salka/Results/'+classifier+'/log/'+orig_time)
     else:
