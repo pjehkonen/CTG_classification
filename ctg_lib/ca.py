@@ -70,9 +70,6 @@ def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
 
     X, y = base_feat(my_env, logger)
 
-    scaler = StandardScaler()
-    X[X.columns] = scaler.fit_transform(X[X.columns].to_numpy())
-
     train_i = np.loadtxt(Path(tt_path, 'train_group.csv'), dtype=int)
     test_i = np.loadtxt(Path(tt_path, 'test_group.csv'), dtype=int)
     X_train = X.loc[train_i]
@@ -80,17 +77,20 @@ def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
     y_train = y[train_i]
     y_test = y[test_i]
 
+    scaler = StandardScaler()
+
     best_model = model.best_estimator_[1]
-    best_model.fit(X_train, y_train)
+    best_model.fit(scaler.fit_transform(X_train), y_train)
 
-    y_train_pred = best_model.predict(X_train)
-    y_test_pred = best_model.predict(X_test)
+    y_train_pred = best_model.predict(scaler.fit_transform(X_train))
+    y_test_pred = best_model.predict(scaler.transform(X_test))
 
-    y_train_pred_prob = best_model.predict_proba(X_train)[:, 1]
-    y_test_pred_prob = best_model.predict_proba(X_test)[:, 1]
+    y_train_pred_prob = best_model.predict_proba(scaler.transform(X_train))[:, 1]
+    y_test_pred_prob = best_model.predict_proba(scaler.transform(X_test))[:, 1]
 
     #plot_roc(model, y_test, y_test_pred, "y test")
     plot_roc(model, y_test, y_test_pred_prob, "y test prob")
     #plot_roc(model, y_train, y_train_pred, "y train")
     plot_roc(model, y_train, y_train_pred_prob, "y train prob")
     plot_matrix(model, X_test, y_test)
+    print("huihai")
