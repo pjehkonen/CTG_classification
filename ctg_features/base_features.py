@@ -18,6 +18,13 @@ def make_y_df(n_size, s_size):
     return y_array
 
 
+def raw_vectors(my_env, logger):
+    normal_df, salt_df = import_data.import_data(False, my_env)
+    X = pd.concat([normal_df, salt_df], ignore_index=True, axis=1)
+    y = make_y_df(normal_df.shape[1], salt_df.shape[1])
+    return X, y
+
+
 def base_feat(my_env, logger, dsetsize=None):
     normal_df, salt_df = import_data.import_data(False, my_env)
     X_in = pd.concat([normal_df, salt_df], ignore_index=True, axis=1)

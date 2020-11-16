@@ -13,6 +13,7 @@ from set_env_dirs import setup_env
 from set_env_dirs import setup_log
 from set_env_dirs import in_triton
 from ctg_lib.ca import ca_one
+from ctg_lib.viz_two_minutes import vis_sample
 
 from ctg_lib import import_data
 from ctg_lib.ctg_time import now_time_string
@@ -40,6 +41,11 @@ def logging_data(logger, X, X_train, X_test, y, y_train, y_test, my_env, start_t
     np.savetxt(Path(my_env.log_dir, start_time + "/train_group.csv"), X_train.index.values, fmt="%d")
 
     logger.info("Test and Training indices written to log with this time_now as identifier")
+
+
+def v_main(PrintDebuggingInfo, classifier, start_time, logger, my_env):
+    vis_sample(PrintDebuggingInfo, classifier, start_time, logger, my_env)
+    print("end v_sample")
 
 def a_main(PrintDebuggingInfo, classifier, start_time, logger, operating_in_triton, my_env):
     ca_one(classifier, start_time, my_env, logger, operating_in_triton)
@@ -96,8 +102,8 @@ def c_main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
 
 
 if __name__ == '__main__':
-    TASKS = ['classify','analyze']
-    TASK = TASKS[1]
+    TASKS = ['classify','analyze', 'visualize']
+    TASK = TASKS[2]
     classifiers = ["K-NearestNeighbor", "SupportVector", "RandomForest"]
     classifier = classifiers[2]
 
@@ -117,6 +123,9 @@ if __name__ == '__main__':
     elif TASK == 'analyze':
         out_dir = 'Analysis_of_'+classifier
 
+    elif TASK == 'visualize':
+        out_dir = 'Visualization_of_'+classifier
+
     else:
         print("unknown task, exiting")
         sys.exit()
@@ -129,6 +138,8 @@ if __name__ == '__main__':
         c_main(PrintDebuggingInfo, classifier, start_time, logger, operating_in_triton, my_env)
     elif TASK == 'analyze':
         a_main(PrintDebuggingInfo, classifier, start_time, logger, True, my_env)
+    elif TASK == 'visualize':
+        v_main(PrintDebuggingInfo, classifier, start_time, logger, my_env)
     else:
         print("error on selecting main, exiting")
         sys.exit()
