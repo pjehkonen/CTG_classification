@@ -47,11 +47,13 @@ def v_main(PrintDebuggingInfo, classifier, start_time, logger, my_env):
     vis_sample(PrintDebuggingInfo, classifier, start_time, logger, my_env)
     print("end v_sample")
 
+
 def a_main(PrintDebuggingInfo, classifier, start_time, logger, operating_in_triton, my_env):
     ca_one(classifier, start_time, my_env, logger, operating_in_triton)
+    print("end ca_one")
+
 
 def c_main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
-
     if operating_in_triton:
         full_data = True
     else:
@@ -65,7 +67,6 @@ def c_main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
         X, y = base_feat(my_env, logger)
     else:
         X, y = base_feat(my_env, logger, 10000)
-
 
     my_test_size = 0.2
     use_shuffle = True
@@ -102,8 +103,8 @@ def c_main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
 
 
 if __name__ == '__main__':
-    TASKS = ['classify','analyze', 'visualize']
-    TASK = TASKS[2]
+    TASKS = ['classify', 'analyze', 'visualize']
+    TASK = TASKS[1]
     classifiers = ["K-NearestNeighbor", "SupportVector", "RandomForest"]
     classifier = classifiers[2]
 
@@ -121,10 +122,10 @@ if __name__ == '__main__':
         out_dir = classifier
 
     elif TASK == 'analyze':
-        out_dir = 'Analysis_of_'+classifier
+        out_dir = 'Analysis_of_' + classifier
 
     elif TASK == 'visualize':
-        out_dir = 'Visualization_of_'+classifier
+        out_dir = 'Visualization_of_' + classifier
 
     else:
         print("unknown task, exiting")
@@ -132,7 +133,6 @@ if __name__ == '__main__':
 
     operating_in_triton, my_env = setup_env.setup_env(PrintDebuggingInfo, output_dir=out_dir, log_start=start_time)
     logger = setup_log.setup_log(PrintDebuggingInfo, my_env, start_time)
-
 
     if TASK == 'classify':
         c_main(PrintDebuggingInfo, classifier, start_time, logger, operating_in_triton, my_env)
@@ -143,5 +143,3 @@ if __name__ == '__main__':
     else:
         print("error on selecting main, exiting")
         sys.exit()
-
-    #ca_one(classifier, start_time, my_env, logger)

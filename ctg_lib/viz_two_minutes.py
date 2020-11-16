@@ -18,8 +18,8 @@ def display_just_fhr(X, y, index1, index2):
     fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(12,6))
     axes[0].set_ylim(40,220)
     axes[1].set_ylim(40,220)
-    axes[0].title.set_text('Sample {} {}'.format(index1, 'zigzag' if y[index1]==1 else 'normal'))
-    axes[1].title.set_text('Sample {} {}'.format(index2, 'zigzag' if y[index2]==1 else 'normal'))
+    axes[0].title.set_text('Training Sample {} {}'.format(index1, 'zigzag' if y[index1]==1 else 'normal'))
+    axes[1].title.set_text('Test Sample {} {}'.format(index2, 'zigzag' if y[index2]==1 else 'normal'))
 
     axes[0].minorticks_on()
     axes[0].grid(which='major', linestyle='-', linewidth='0.5', color='black')
@@ -41,7 +41,7 @@ def display_just_fhr(X, y, index1, index2):
     X.plot(y=[index1],ax=axes[0], grid=True)
     X.plot(y=[index2],ax=axes[1], grid=True)
 
-    fig.suptitle("Two Minutes of : {} and {}".format(index1, index2))
+    fig.suptitle("Misspredicted training {} and test {}".format(index1, index2))
     axes[0].set_xticks(x_label_index)
     axes[0].set_xticklabels(x_labels)
     axes[1].set_xticks(x_label_index)
@@ -56,10 +56,13 @@ def display_just_fhr(X, y, index1, index2):
     plt.show()
 
 
-def vis_sample(PrintDebuggingInfo, classifier, start_time, logger, my_env, index1=12345, index2=235234):
+def vis_sample(PrintDebuggingInfo, classifier, start_time, logger, my_env, train_list=[12345], test_list=[235234]):
     X, y = raw_vectors(my_env, logger)
 
-    display_just_fhr(X, y, index1, index2)
+    for i, element in enumerate(test_list):
+        if i>10:
+            break
+        display_just_fhr(X, y, train_list[i], element)
 
     print('end of vis_sample')
 

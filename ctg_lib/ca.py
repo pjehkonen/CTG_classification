@@ -14,6 +14,8 @@ from sklearn.metrics import plot_confusion_matrix
 from ctg_lib.ctg_path_env import in_triton
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
+from ctg_lib.viz_two_minutes import vis_sample
+
 
 import matplotlib
 
@@ -22,6 +24,18 @@ if in_triton():
 import matplotlib.pyplot as plt
 
 from joblib import dump, load
+
+
+
+def vizz(train_i, test_i, y_train, y_train_pred, y_test, y_test_pred, classifier, start_time, logger, my_env):
+
+
+     # First find the index where predicted labels do not match, original X and y rows are the index
+    index_of_training_errors = train_i[y_train!=y_train_pred]
+    index_of_testing_errors =  test_i[y_test!=y_test_pred]
+
+    vis_sample(True, classifier, start_time, logger, my_env, index_of_training_errors, index_of_testing_errors)
+
 
 def plot_matrix(model, X_test, y_test):
     plt.style.use('default')
@@ -113,4 +127,6 @@ def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
     print("Classification report testing")
     print(classification_report(y_test, y_test_pred))
 
-    print("huihai")
+    vizz(train_i, test_i, y_train, y_train_pred, y_test, y_test_pred, classifier, start_time, logger, my_env)
+
+    print("end ca_one function")
