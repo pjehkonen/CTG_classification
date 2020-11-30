@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from ctg_classifiers.KNN_classification import CTG_KNN
 from ctg_classifiers.SVM_classification import CTG_SVC
 from ctg_classifiers.RF_classification import CTG_RF
-from ctg_features.base_features import base_feat
+from ctg_features.base_features import base_feat, spectrum_feat
 
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
@@ -62,9 +62,12 @@ def c_main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
     logger.info("This is log file for classification algorithm of {}".format(out_dir))
 
     if full_data:
-        X, y = base_feat(my_env, logger)
+        #X, y = base_feat(my_env, logger)
+        X, y = spectrum_feat(my_env, logger)
+
     else:
-        X, y = base_feat(my_env, logger, 10000)
+        #X, y = base_feat(my_env, logger, 10000)
+        X, y = spectrum_feat(my_env, logger, 10000)
 
     my_test_size = 0.2
     use_shuffle = True
@@ -102,7 +105,7 @@ def c_main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
 
 if __name__ == '__main__':
     TASKS = ['classify', 'analyze', 'visualize']
-    TASK = TASKS[2]
+    TASK = TASKS[0]
     classifiers = ["K-NearestNeighbor", "SupportVector", "RandomForest"]
     classifier = classifiers[2]
 

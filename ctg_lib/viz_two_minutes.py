@@ -13,7 +13,7 @@ def display_spectrum(sample):
     sample = sample-np.median(sample)
     ps = np.abs(np.fft.fft(sample)) ** 2
     time_step = 0.25
-    zoom = 8
+    zoom = 2
     freqs = np.fft.fftfreq(sample.size, time_step)
     idx = np.argsort(freqs)
     half_way = len(freqs) // 2
@@ -21,10 +21,11 @@ def display_spectrum(sample):
     ps2 = ps2/np.max(ps2)
     plt.plot(freqs[idx[half_way:half_way+(half_way//zoom)]], ps2[:half_way//zoom])
     plt.show()
-    bins = np.array([0, 3, 8])
-    e1 = np.sum(ps2[0:3])
-    e2 = np.sum(ps2[3:8])
-    e3 = np.sum(ps2[8:])
+    bin = []
+    bin.append(np.sum(ps2[2:5]))   # lowest frequency bin excluding near DC
+    bin.append(np.sum(ps2[5:12]))  # second lowest bin of frequencies
+    bin.append(np.sum(ps2[12:]))   # rest of the spectral energy
+    print(bin)
 
     print("finished plotting")
 
@@ -86,6 +87,7 @@ def vis_sample(PrintDebuggingInfo, classifier, start_time, logger, my_env, train
         display_spectrum(X[0].values)
         display_spectrum(X[12345].values)
         display_spectrum(X[235234].values)
+        display_spectrum(X[100000].values)
 
     else:
         for i, element in enumerate(test_list):
