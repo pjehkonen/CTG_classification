@@ -1,6 +1,7 @@
 from ctg_lib import import_data
 import pandas as pd
 import numpy as np
+import math
 
 
 def log_features(X, logger, feature_func):
@@ -54,7 +55,9 @@ def gen_spect(sample):
     idx = np.argsort(freqs)
     half_way = len(freqs) // 2
     ps2 = 2 * ps[:half_way]
-    ps2 = ps2/np.max(ps2)
+
+    if not math.isclose(0, ps2.max()):
+        ps2 = ps2/np.max(ps2)
     bin = []
     bin.append(np.sum(ps2[2:5]))   # lowest frequency bin excluding near DC
     bin.append(np.sum(ps2[5:12]))  # second lowest bin of frequencies
