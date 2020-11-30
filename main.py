@@ -1,5 +1,4 @@
 import sys
-import pandas as pd
 import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -15,7 +14,6 @@ from set_env_dirs import in_triton
 from ctg_lib.ca import ca_one
 from ctg_lib.viz_two_minutes import vis_sample
 
-from ctg_lib import import_data
 from ctg_lib.ctg_time import now_time_string
 
 
@@ -104,7 +102,7 @@ def c_main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
 
 if __name__ == '__main__':
     TASKS = ['classify', 'analyze', 'visualize']
-    TASK = TASKS[1]
+    TASK = TASKS[2]
     classifiers = ["K-NearestNeighbor", "SupportVector", "RandomForest"]
     classifier = classifiers[2]
 

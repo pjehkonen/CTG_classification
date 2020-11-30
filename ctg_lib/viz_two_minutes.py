@@ -1,3 +1,4 @@
+from __future__ import division
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,6 +8,25 @@ import json
 import sys
 from scipy.stats import median_absolute_deviation
 from ctg_features.base_features import base_feat, raw_vectors
+
+def display_spectrum(sample):
+    sample = sample-np.median(sample)
+    ps = np.abs(np.fft.fft(sample)) ** 2
+    time_step = 0.25
+    zoom = 8
+    freqs = np.fft.fftfreq(sample.size, time_step)
+    idx = np.argsort(freqs)
+    half_way = len(freqs) // 2
+    ps2 = 2 * ps[:half_way]
+    ps2 = ps2/np.max(ps2)
+    plt.plot(freqs[idx[half_way:half_way+(half_way//zoom)]], ps2[:half_way//zoom])
+    plt.show()
+    bins = np.array([0, 3, 8])
+    e1 = np.sum(ps2[0:3])
+    e2 = np.sum(ps2[3:8])
+    e3 = np.sum(ps2[8:])
+
+    print("finished plotting")
 
 
 def display_just_fhr(X, y, index1, index2):
@@ -59,10 +79,19 @@ def display_just_fhr(X, y, index1, index2):
 def vis_sample(PrintDebuggingInfo, classifier, start_time, logger, my_env, train_list=[12345], test_list=[235234]):
     X, y = raw_vectors(my_env, logger)
 
-    for i, element in enumerate(test_list):
-        if i>10:
-            break
-        display_just_fhr(X, y, train_list[i], element)
+    debug_this = True
+
+    if debug_this:
+
+        display_spectrum(X[0].values)
+        display_spectrum(X[12345].values)
+        display_spectrum(X[235234].values)
+
+    else:
+        for i, element in enumerate(test_list):
+            if i>10:
+                break
+            display_just_fhr(X, y, train_list[i], element)
 
     print('end of vis_sample')
 
