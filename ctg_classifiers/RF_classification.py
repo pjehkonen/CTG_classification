@@ -149,7 +149,7 @@ def make_grid_cv_svc(pipeline, parameters, my_scoring, nn_jobs, N_cv, logger):
 def CTG_RF(X_train, X_test, y_train, y_test, logger, classifier, myEnv, start_time):
 
     # Setting Random Forest parameters for both hyperparameter search and criteria
-    my_n_estimators = [100, 125, 150, 175, 200, 225]
+    my_n_estimators = [75, 90, 100, 115]
     my_criterion = 'gini' # 'gini' or 'entropy'
     my_criterions = ['gini','entropy']
     my_min_depth = 4

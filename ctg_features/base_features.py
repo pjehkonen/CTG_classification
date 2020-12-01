@@ -61,7 +61,8 @@ def gen_spect(sample):
     bin = []
     bin.append(np.sum(ps2[2:5]))   # lowest frequency bin excluding near DC
     bin.append(np.sum(ps2[5:12]))  # second lowest bin of frequencies
-    bin.append(np.sum(ps2[12:]))   # rest of the spectral energy
+    bin.append(np.sum(ps2[12:30])) # mid segment of the spectral energy
+    bin.append(np.sum(ps2[12:30])) # rest of the spectral energy
 
     return bin
 
@@ -71,14 +72,15 @@ def spectrum_feat(my_env, logger, dsetsize=None):
     X_in = pd.concat([normal_df, salt_df], ignore_index=True, axis=1)
     y = make_y_df(normal_df.shape[1], salt_df.shape[1])
 
-    dc, low, rest = [], [], []
+    dc, low, mid, rest = [], [], [], []
     for column in X_in.columns:
         bins = gen_spect(X_in[column].values)
         dc.append(bins[0])
         low.append(bins[1])
-        rest.append(bins[2])
+        mid.append(bins[2])
+        rest.append(bins[3])
 
-    X = pd.DataFrame(np.array([dc, low, rest]).T, columns=['FRQ_DC','FRQ_LOW','FRQ_HIGH'])
+    X = pd.DataFrame(np.array([dc, low, mid, rest]).T, columns=['FRQ_DC','FRQ_LOW', 'FRQ_MID','FRQ_HIGH'])
 
     if dsetsize is not None:
         X = X.sample(dsetsize)
