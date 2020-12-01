@@ -2,6 +2,7 @@ from ctg_lib import import_data
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.signal import butter, lfilter, argrelextrema
 
 def log_features(X, logger, feature_func):
     feats = X.columns
@@ -103,21 +104,31 @@ def autocorr_feat(my_env, logger, dsetsize=None):
     X_in = pd.concat([normal_df, salt_df], ignore_index=True, axis=1)
     y = make_y_df(normal_df.shape[1], salt_df.shape[1])
 
-    arvot = smart_scale(X_in[2].values)
+    b, a = butter(3, 0.1, btype='low', analog=False) # 3-tap, 0.1 normalized low pass filter
 
-    dc, low, mid, rest = [], [], [], []
+    max_mins, min_sum, max_sum, min_median, max_median, min_std, max_std = [], [], [], [], [], [], []
     for column in X_in.columns:
-        bins = gen_spect(X_in[column].values)
-        dc.append(bins[0])
-        low.append(bins[1])
-        mid.append(bins[2])
-        rest.append(bins[3])
+        sig = smart_scale(X_in[column].values) # zero center normalized or below 1.0 max
+        lags, c, _, _ = plt.acorr(sig, maxlags=200) # autocorrelation in c with 200 lags
+        c_filt = lfilter(b, a, c) # smooth the signal
+        max_indx_list = argrelextrema(c_filt, np.greater)[0]
+        min_indx_list = argrelextrema(c_filt, np.less)[0]
+        maximums = c_filt[max_indx_list]
+        minimums = c_filt[min_indx_list]
+        max_mins.append(len(max_indx_list)+len(min_indx_list))
+        min_sum.append(np.sum(minimums))
+        max_sum.append(np.sum(maximums))
+        min_median.append(np.median(minimums))
+        max_median.append(np.median(maximums))
+        min_std.append(np.std(minimums))
+        max_std.append(np.std(maximums))
 
-    X = pd.DataFrame(np.array([dc, low, mid, rest]).T, columns=['FRQ_DC','FRQ_LOW', 'FRQ_MID','FRQ_HIGH'])
+    X = pd.DataFrame(np.array([max_mins, min_sum, max_sum, min_median, max_median, min_std, max_std]).T,
+                     columns=['MAX_MINS','MIN_SUM','MAX_SUM','MIN_MEDIAN', 'MAX_MEDIAN', 'MIN_STD','MAX_STD'])
 
     if dsetsize is not None:
         X = X.sample(dsetsize)
         y = y[X.index.values]
 
-    log_features(X, logger, "spectrum_feat")
+    log_features(X, logger, "autocorr_feat")
     return X, y
