@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=RF_CTG
 #SBATCH -c 32
-#SBATCH -t 3:00:00
-#SBATCH --mem=32000
+#SBATCH -t 0:30:00
+#SBATCH --mem=20000
 #SBATCH --output=/scratch/cs/salka/scratch/rf.%j.out
 
 export NUMEXPR_MAX_THREADS=32
