@@ -110,6 +110,7 @@ def autocorr_feat(my_env, logger, dsetsize=None):
     for column in X_in.columns:
         sig = smart_scale(X_in[column].values) # zero center normalized or below 1.0 max
         lags, c, _, _ = plt.acorr(sig, maxlags=200) # autocorrelation in c with 200 lags
+        plt.clf()
         c_filt = lfilter(b, a, c) # smooth the signal
         max_indx_list = argrelextrema(c_filt, np.greater)[0]
         min_indx_list = argrelextrema(c_filt, np.less)[0]
