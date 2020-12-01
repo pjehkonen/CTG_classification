@@ -1,8 +1,7 @@
 from ctg_lib import import_data
 import pandas as pd
 import numpy as np
-import math
-
+import matplotlib.pyplot as plt
 
 def log_features(X, logger, feature_func):
     feats = X.columns
@@ -46,6 +45,15 @@ def base_feat(my_env, logger, dsetsize=None):
     return X, y
 
 
+def smart_scale(my_vector):
+    my_vector = my_vector - np.median(my_vector) # center
+
+    if my_vector.max() < 1.0:
+        return my_vector
+    else:
+        return my_vector / np.max(my_vector) # scale
+
+
 def gen_spect(sample):
     sample = sample-np.median(sample)
     ps = np.abs(np.fft.fft(sample)) ** 2
@@ -56,8 +64,8 @@ def gen_spect(sample):
     half_way = len(freqs) // 2
     ps2 = 2 * ps[:half_way]
 
-    if not math.isclose(0, ps2.max()):
-        ps2 = ps2/np.max(ps2)
+    ps2 = smart_scale(ps2)
+
     bin = []
     bin.append(np.sum(ps2[2:5]))   # lowest frequency bin excluding near DC
     bin.append(np.sum(ps2[5:12]))  # second lowest bin of frequencies
@@ -94,6 +102,8 @@ def autocorr_feat(my_env, logger, dsetsize=None):
     normal_df, salt_df = import_data.import_data(False, my_env)
     X_in = pd.concat([normal_df, salt_df], ignore_index=True, axis=1)
     y = make_y_df(normal_df.shape[1], salt_df.shape[1])
+
+    arvot = smart_scale(X_in[2].values)
 
     dc, low, mid, rest = [], [], [], []
     for column in X_in.columns:
