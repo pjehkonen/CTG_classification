@@ -88,3 +88,26 @@ def spectrum_feat(my_env, logger, dsetsize=None):
 
     log_features(X, logger, "spectrum_feat")
     return X, y
+
+
+def autocorr_feat(my_env, logger, dsetsize=None):
+    normal_df, salt_df = import_data.import_data(False, my_env)
+    X_in = pd.concat([normal_df, salt_df], ignore_index=True, axis=1)
+    y = make_y_df(normal_df.shape[1], salt_df.shape[1])
+
+    dc, low, mid, rest = [], [], [], []
+    for column in X_in.columns:
+        bins = gen_spect(X_in[column].values)
+        dc.append(bins[0])
+        low.append(bins[1])
+        mid.append(bins[2])
+        rest.append(bins[3])
+
+    X = pd.DataFrame(np.array([dc, low, mid, rest]).T, columns=['FRQ_DC','FRQ_LOW', 'FRQ_MID','FRQ_HIGH'])
+
+    if dsetsize is not None:
+        X = X.sample(dsetsize)
+        y = y[X.index.values]
+
+    log_features(X, logger, "spectrum_feat")
+    return X, y
