@@ -1,6 +1,6 @@
 # Classification analysis
 
-from ctg_features.base_features import base_feat
+from ctg_features.base_features import base_feat, spectrum_feat
 from set_env_dirs import setup_env
 from set_env_dirs import setup_log
 from pathlib import Path
@@ -76,7 +76,8 @@ def plot_roc(pipe_model, ground_truth, estimate, message):
 
 def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
     #orig_time = '2020-11-12_20-20-28'
-    orig_time = '2020-11-15_19-15-20'
+    #orig_time = '2020-11-15_19-15-20'
+    orig_time = '2020-12-01_08-55-29'
     if operating_in_triton:
         tt_path = Path('/run/user/1000/gvfs/smb-share:server=data.triton.aalto.fi,share=scratch/cs/salka/Results/'+classifier+'/log/'+orig_time)
     else:
@@ -85,7 +86,8 @@ def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
 
     model = load(trained_classifier)
 
-    X, y = base_feat(my_env, logger)
+    #X, y = base_feat(my_env, logger)
+    X, y = spectrum_feat(my_env, logger)
 
     train_i = np.loadtxt(Path(tt_path, 'train_group.csv'), dtype=int)
     test_i = np.loadtxt(Path(tt_path, 'test_group.csv'), dtype=int)

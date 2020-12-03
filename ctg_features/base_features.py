@@ -107,7 +107,9 @@ def autocorr_feat(my_env, logger, dsetsize=None):
     b, a = butter(3, 0.1, btype='low', analog=False) # 3-tap, 0.1 normalized low pass filter
 
     max_mins, min_sum, max_sum, min_median, max_median, min_std, max_std = [], [], [], [], [], [], []
-    for column in X_in.columns:
+    for i, column in enumerate(X_in.columns):
+        if i>100:
+            break
         sig = smart_scale(X_in[column].values) # zero center normalized or below 1.0 max
         lags, c, _, _ = plt.acorr(sig, maxlags=200) # autocorrelation in c with 200 lags
         plt.clf()
@@ -127,9 +129,10 @@ def autocorr_feat(my_env, logger, dsetsize=None):
     X = pd.DataFrame(np.array([max_mins, min_sum, max_sum, min_median, max_median, min_std, max_std]).T,
                      columns=['MAX_MINS','MIN_SUM','MAX_SUM','MIN_MEDIAN', 'MAX_MEDIAN', 'MIN_STD','MAX_STD'])
 
+    '''
     if dsetsize is not None:
         X = X.sample(dsetsize)
         y = y[X.index.values]
-
+    '''
     log_features(X, logger, "autocorr_feat")
     return X, y
