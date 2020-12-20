@@ -71,7 +71,7 @@ def gen_spect(sample):
     bin.append(np.sum(ps2[2:5]))   # lowest frequency bin excluding near DC
     bin.append(np.sum(ps2[5:12]))  # second lowest bin of frequencies
     bin.append(np.sum(ps2[12:30])) # mid segment of the spectral energy
-    bin.append(np.sum(ps2[12:30])) # rest of the spectral energy
+    bin.append(np.sum(ps2[30:]))   # rest of the spectral energy
 
     return bin
 

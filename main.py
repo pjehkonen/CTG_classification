@@ -63,13 +63,13 @@ def c_main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
 
     if full_data:
         #X, y = base_feat(my_env, logger)
-        #X, y = spectrum_feat(my_env, logger)
-        X, y = autocorr_feat(my_env, logger)
+        X, y = spectrum_feat(my_env, logger)
+        #X, y = autocorr_feat(my_env, logger)
 
     else:
         #X, y = base_feat(my_env, logger, 10000)
-        #X, y = spectrum_feat(my_env, logger, 10000)
-        X, y = autocorr_feat(my_env, logger, 10000)
+        X, y = spectrum_feat(my_env, logger, 10000)
+        #X, y = autocorr_feat(my_env, logger, 10000)
 
     my_test_size = 0.2
     use_shuffle = True
@@ -107,7 +107,7 @@ def c_main(pdg, classifier, start_time, logger, operating_in_triton, my_env):
 
 if __name__ == '__main__':
     TASKS = ['classify', 'analyze', 'visualize']
-    TASK = TASKS[1]
+    TASK = TASKS[0]
     classifiers = ["K-NearestNeighbor", "SupportVector", "RandomForest"]
     classifier = classifiers[2]
 

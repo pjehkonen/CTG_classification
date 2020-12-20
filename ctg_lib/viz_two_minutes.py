@@ -80,7 +80,7 @@ def display_just_fhr(X, y, index1, index2):
 def vis_sample(PrintDebuggingInfo, classifier, start_time, logger, my_env, train_list=[12345], test_list=[235234]):
     X, y = raw_vectors(my_env, logger)
 
-    debug_this = True
+    debug_this = False
 
     if debug_this:
 
@@ -91,7 +91,7 @@ def vis_sample(PrintDebuggingInfo, classifier, start_time, logger, my_env, train
 
     else:
         for i, element in enumerate(test_list):
-            if i>10:
+            if i>20:
                 break
             display_just_fhr(X, y, train_list[i], element)
 
