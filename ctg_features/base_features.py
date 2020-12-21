@@ -82,7 +82,7 @@ def gen_spect(sample):
     half_way = len(freqs) // 2
     ps2 = 2 * ps[:half_way]
 
-    ps2 = smart_scale(ps2)
+    #ps2 = smart_scale(ps2)
 
     bin = []
     bin.append(np.sum(ps2[2:5]))   # lowest frequency bin excluding near DC
@@ -116,7 +116,10 @@ def spectrum_feat(my_env, logger, dsetsize=None):
         C.append(bins[7])
         D.append(bins[8])
 
-    X = pd.DataFrame(np.array([dc, low, mid, high, uh, A, B, C, D]).T, columns=['SP_ULF','SP_VLF', 'SP_LF','SP_HF', 'SP_RF', 'A', 'B', 'C','D'])
+    #X = pd.DataFrame(np.array([dc, low, mid, high, uh, A, B, C, D]).T, columns=['SP_ULF','SP_VLF', 'SP_LF','SP_HF', 'SP_RF', 'A', 'B', 'C','D'])
+
+    X = pd.DataFrame(np.array([dc, low, mid, high, uh, A, B, C, D]).T,
+                     columns=['SP_ULF', 'SP_VLF', 'SP_LF', 'SP_A', 'SP_B', 'SP_C', 'SP_D', 'SP_E', 'SP_F'])
 
     if dsetsize is not None:
         X = X.sample(dsetsize)
