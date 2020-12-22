@@ -44,9 +44,11 @@ def plot_matrix(model, X_test, y_test):
     my_title = "{} Confusion Matrix ({})".format(model.estimator.steps[1][0], model.scoring)
     class_names = ['normal','zigzag']
     plot_confusion_matrix(model, X_test, y_test,
-                                 display_labels=class_names,
-                                 cmap=plt.cm.Blues,
-                                 normalize=None)
+                          display_labels=class_names,
+                          cmap=plt.cm.Blues,
+                          normalize=None,
+                          colorbar=False
+                          )
     plt.title(my_title)
 
     plt.show()
@@ -76,8 +78,10 @@ def plot_roc(pipe_model, ground_truth, estimate, message):
 
 def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
     #orig_time = '2020-11-12_20-20-28'
-    orig_time = '2020-11-15_19-15-20'
+    #orig_time = '2020-11-15_19-15-20'
     #orig_time = '2020-12-01_08-55-29'
+    #orig_time = '2020-11-03_13-54-01'
+    orig_time = '2020-11-03_13-46-04'
     if operating_in_triton:
         tt_path = Path('/run/user/1000/gvfs/smb-share:server=data.triton.aalto.fi,share=scratch/cs/salka/Results/'+classifier+'/log/'+orig_time)
     else:
