@@ -88,13 +88,14 @@ def gen_spect(sample):
     bin.append(np.sum(ps2[2:5]))   # lowest frequency bin excluding near DC
     bin.append(np.sum(ps2[5:12]))  # second lowest bin of frequencies
     bin.append(np.sum(ps2[12:30])) # mid segment of the spectral energy
-    bin.append(np.sum(ps2[30:90])) # high segment of the spectral energy
+    bin.append(np.sum(ps2[30:])) # high segment of the spectral energy
+    ''''
     bin.append(np.sum(ps2[90:120]))
     bin.append(np.sum(ps2[120:150]))
     bin.append(np.sum(ps2[150:180]))
     bin.append(np.sum(ps2[180:210]))
     bin.append(np.sum(ps2[210:]))
-
+    '''
     return bin
 
 
@@ -103,23 +104,19 @@ def spectrum_feat(my_env, logger, dsetsize=None):
     X_in = pd.concat([normal_df, salt_df], ignore_index=True, axis=1)
     y = make_y_df(normal_df.shape[1], salt_df.shape[1])
 
-    dc, low, mid, high, uh, A, B, C, D = [], [], [], [], [], [], [], [], []
+    #dc, low, mid, high, uh, A, B, C, D = [], [], [], [], [], [], [], [], []
+    dc, low, mid, high = [], [], [], []
     for column in X_in.columns:
         bins = gen_spect(X_in[column].values)
         dc.append(bins[0])
         low.append(bins[1])
         mid.append(bins[2])
         high.append(bins[3])
-        uh.append(bins[4])
-        A.append(bins[5])
-        B.append(bins[6])
-        C.append(bins[7])
-        D.append(bins[8])
 
-    #X = pd.DataFrame(np.array([dc, low, mid, high, uh, A, B, C, D]).T, columns=['SP_ULF','SP_VLF', 'SP_LF','SP_HF', 'SP_RF', 'A', 'B', 'C','D'])
+    X = pd.DataFrame(np.array([dc, low, mid, high]).T, columns=['SP_ULF','SP_VLF', 'SP_LF','SP_HF'])
 
-    X = pd.DataFrame(np.array([dc, low, mid, high, uh, A, B, C, D]).T,
-                     columns=['SP_ULF', 'SP_VLF', 'SP_LF', 'SP_A', 'SP_B', 'SP_C', 'SP_D', 'SP_E', 'SP_F'])
+    #X = pd.DataFrame(np.array([dc, low, mid, high, uh, A, B, C, D]).T,
+    #                 columns=['SP_ULF', 'SP_VLF', 'SP_LF', 'SP_A', 'SP_B', 'SP_C', 'SP_D', 'SP_E', 'SP_F'])
 
     if dsetsize is not None:
         X = X.sample(dsetsize)

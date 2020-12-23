@@ -81,7 +81,9 @@ def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
     #orig_time = '2020-11-15_19-15-20'
     #orig_time = '2020-12-01_08-55-29'
     #orig_time = '2020-11-03_13-54-01'
-    orig_time = '2020-11-03_13-46-04'
+    #orig_time = '2020-11-03_13-46-04'
+    #orig_time = '2020-11-05_10-03-09'
+    orig_time ='2020-12-01_08-55-29'
     if operating_in_triton:
         tt_path = Path('/run/user/1000/gvfs/smb-share:server=data.triton.aalto.fi,share=scratch/cs/salka/Results/'+classifier+'/log/'+orig_time)
     else:
@@ -133,6 +135,6 @@ def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
     print("Classification report testing")
     print(classification_report(y_test, y_test_pred))
 
-    vizz(train_i, test_i, y_train, y_train_pred, y_test, y_test_pred, classifier, start_time, logger, my_env)
+    #vizz(train_i, test_i, y_train, y_train_pred, y_test, y_test_pred, classifier, start_time, logger, my_env)
 
     print("end ca_one function")

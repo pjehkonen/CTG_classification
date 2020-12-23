@@ -109,7 +109,7 @@ if __name__ == '__main__':
     TASKS = ['classify', 'analyze', 'visualize']
     TASK = TASKS[1]
     classifiers = ["K-NearestNeighbor", "SupportVector", "RandomForest"]
-    classifier = classifiers[0]
+    classifier = classifiers[2]
 
     start_time = now_time_string()
     PrintDebuggingInfo = True
