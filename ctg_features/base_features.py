@@ -82,7 +82,7 @@ def gen_spect(sample):
     half_way = len(freqs) // 2
     ps2 = 2 * ps[:half_way]
 
-    #ps2 = smart_scale(ps2)
+    ps2 = smart_scale(ps2)
 
     bin = []
     bin.append(np.sum(ps2[2:5]))   # lowest frequency bin excluding near DC

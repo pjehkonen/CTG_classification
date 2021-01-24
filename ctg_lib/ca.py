@@ -92,8 +92,8 @@ def ca_one(classifier, start_time, my_env, logger, operating_in_triton):
 
     model = load(trained_classifier)
 
-    X, y = base_feat(my_env, logger)
-    #X, y = spectrum_feat(my_env, logger)
+    #X, y = base_feat(my_env, logger)
+    X, y = spectrum_feat(my_env, logger)
 
     train_i = np.loadtxt(Path(tt_path, 'train_group.csv'), dtype=int)
     test_i = np.loadtxt(Path(tt_path, 'test_group.csv'), dtype=int)
